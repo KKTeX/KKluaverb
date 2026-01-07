@@ -1,0 +1,53 @@
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{KKluaverb}[2026/01/07 v1.0.0]
+
+\def\kklv@pkgname{KKluaverb}
+\ifdefined\directlua\else
+  \PackageError{\kklv@pkgname}{This package requires LuaLaTeX}{Please use lualatex engine.}
+  \expandafter\endinput
+\fi
+
+\directlua{
+  if tex.extraprimitives then
+    tex.enableprimitives("luatex@", tex.extraprimitives("omega", "aleph", "luatex"))
+  end
+}
+
+\RequirePackage{luatexbase}
+\RequirePackage{pgfkeys, xcolor}
+
+% kvop
+\pgfkeys{
+  /kklv/.is family, /kklv/.cd,
+  font/.store in  = \kklv@set@font,
+  color/.store in = \kklv@set@color,
+}
+\newcommand{\KKvOpChange}[1]{%
+  \pgfkeys{/kklv/.cd, #1}%
+}
+\KKvOpChange{font=\ttfamily, color=black}
+\directlua{require("KKluaverb")}
+
+% delimiters
+\newtoks\kklv@delims
+\newcommand{\KKvSetDelims}[2]{%
+  \kklv@delims{{#1}{#2}}%
+}
+\KKvSetDelims{|}{|}
+
+% main
+\NewDocumentCommand{\KKvPrint}{ m }{%
+  \begingroup%
+    \kklv@set@font%
+    \color{\kklv@set@color}%
+    \directlua{KKLuaVerb.decode([[#1]])}%
+  \endgroup%
+}
+
+\directlua{
+  luatexbase.add_to_callback("process_input_buffer", KKLuaVerb.scanner, "kkluaverb_scanner")
+}
+
+\newcommand{\KKverb}{} 
+
+\endinput
