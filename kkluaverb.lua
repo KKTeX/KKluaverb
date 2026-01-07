@@ -63,19 +63,11 @@ function KKV.decode(rstr)
     :gsub('*u(%x%x%x%x)', chex)
     :gsub('*(%x%x)', chex)
 
-  -- It doesn't work.
-  local lines = {}
-  for s in decoded:gmatch("[^\n]+") do
-    table.insert(lines, s)
-  end
+  -- test
+  -- local txt = decoded:gsub("\n%s*", ""):gsub("%s*\n", "")
+  --
 
-  for i, v in ipairs(lines) do
-    tex.sprint(-2, v)
-    if i < #lines then
-      tex.sprint("\\unskip") 
-    end
-  end
-  ---
+  tex.sprint(-2, decoded)
 end
 
 -- 3. Scan
@@ -104,6 +96,12 @@ function KKV.scanner(line)
           break
         end
       else
+        -- test
+        if pos == 1 then
+          line = line:gsub("^%s+", "")
+        end
+        --
+
         local s_idx, e_idx = line:find(trm, pos, true)
         
         if s_idx then
@@ -113,7 +111,16 @@ function KKV.scanner(line)
           pos = e_idx + 1
         else
           local content = line:sub(pos)
-          table.insert(res, KKV.encode(content .. ""))
+
+          -- test
+          if pos == 1 then
+            line = line:gsub("^%s+", "")
+          end
+          --
+
+          table.insert(res, KKV.encode(content) 
+          .. "%"
+          )
           break
         end
       end
