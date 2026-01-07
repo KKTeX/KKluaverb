@@ -57,16 +57,25 @@ end
 
 -- 2. decode
 function KKV.decode(rstr)
-    -- the rule of decoding
     local chex = function(s) return utf8.char(tonumber(s, 16)) end
-
-    -- main decoder
     local decoded = rstr
         :gsub('*U(%x%x%x%x%x%x)', chex)
         :gsub('*u(%x%x%x%x)', chex)
         :gsub('*(%x%x)', chex)
 
-    tex.sprint(-2, decoded)
+    -- It doesn't work.
+    local lines = {}
+    for s in decoded:gmatch("[^\n]+") do
+        table.insert(lines, s)
+    end
+
+    for i, v in ipairs(lines) do
+        tex.sprint(-2, v)
+        if i < #lines then
+            tex.sprint("\\unskip") 
+        end
+    end
+    ---
 end
 
 -- 3. scan
