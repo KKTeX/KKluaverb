@@ -15,12 +15,12 @@ function KKV.check_delimiters()
   
   -- Prohibit blank
   if not ini or not trm or ini == "" or trm == "" then
-      return false
+    return false
   end
   
   -- Prohibit numbers and alphabets
   if ini:match("^[0-9A-Za-z]") or trm:match("[0-9A-Za-z]$") then
-      return false 
+    return false 
   end
 
   -- If the result is false, 
@@ -40,14 +40,14 @@ function KKV.encode(str)
     else
       local formatted
       if code < 0x100 then
-          -- 2-digits
-          formatted = string.format("*%02X", code)
+        -- 2-digits
+        formatted = string.format("*%02X", code)
       elseif code < 0x10000 then
-          -- 4-digits
-          formatted = string.format("*u%04X", code)
+        -- 4-digits
+        formatted = string.format("*u%04X", code)
       else
-          -- 6-digits
-          formatted = string.format("*U%06X", code)
+        -- 6-digits
+        formatted = string.format("*U%06X", code)
       end
       table.insert(t, formatted)
     end
