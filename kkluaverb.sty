@@ -1,63 +1,42 @@
-% Bug: 改行の完全な無効化がうまくいっていない
-
-% 最終的には
-% ・空白をユーザーが指定可能な記号で明示できるように
-% ・改行の扱いをユーザーが指定できるように
-% ・\KKverbの名称も指定可能に
-
-
+% KKluaverb.sty
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{KKluaverb}[2026/01/07 v1.0.0]
+\ProvidesPackage{KKluaverb}[2026/01/08 v1.3.0]
 
-\def\kklv@pkgname{KKluaverb}
-\ifdefined\directlua\else
-  \PackageError{\kklv@pkgname}{This package requires LuaLaTeX}{Please use lualatex engine.}
-  \expandafter\endinput
-\fi
-
-\directlua{
-  if tex.extraprimitives then
-    tex.enableprimitives("luatex@", tex.extraprimitives("omega", "aleph", "luatex"))
-  end
-}
-
+%%% package
 \RequirePackage{luatexbase}
 \RequirePackage{pgfkeys, xcolor}
+\directlua{require("KKluaverb")}
+%%%
 
-% kvop
+%%% kvop
 \pgfkeys{
   /kklv/.is family, /kklv/.cd,
   font/.store in  = \kklv@set@font,
   color/.store in = \kklv@set@color,
 }
-\newcommand{\KKvOpChange}[1]{%
-  \pgfkeys{/kklv/.cd, #1}%
-}
+\newcommand{\KKvOpChange}[1]{\pgfkeys{/kklv/.cd, #1}}
 \KKvOpChange{font=\ttfamily, color=black}
-\directlua{require("KKluaverb")}
+%%%
 
-% delimiters
+%%% def delims
 \newtoks\kklv@delims
-\newcommand{\KKvSetDelims}[2]{%
-  \kklv@delims{{#1}{#2}}%
-  \directlua{
-    if not KKLuaVerb.check_delimiters() then
-      tex.print("\\PackageError{KKluaverb}{Invalid Delimiters}{Use non-alphanumeric characters.}")
-    end
-  }%
-}
+\newcommand{\KKvSetDelims}[2]{\kklv@delims{{#1}{#2}}}
 \KKvSetDelims{|}{|}
+%%%
 
-\NewDocumentCommand{\KKvPrint}{ m }{%
+%%% main
+\def\KKvS*#1\KKvE*{%
   \begingroup%
     \kklv@set@font%
     \color{\kklv@set@color}%
     \directlua{KKLuaVerb.decode([[#1]])}%
   \endgroup%
 }
-
 \directlua{
-  luatexbase.add_to_callback("process_input_buffer", KKLuaVerb.scanner, "kkluaverb_scanner")
+  luatexbase.add_to_callback("process_input_buffer",
+  KKLuaVerb.scanner, "kkluaverb_scanner")
 }
+\newcommand{\KKverb}{} 
+%%%
 
 \endinput
