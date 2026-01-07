@@ -33,11 +33,16 @@
 
 %%% main
 \def\KKlvStart*#1\KKlvEnd*{%
-  \begingroup%
-    \kklv@set@font%
-    \color{\kklv@set@color}%
-    \directlua{KKLuaVerb.decode([[#1]])}%
-  \endgroup%
+  \ifx\protect\relax%
+    \begingroup%
+      \kklv@set@font%
+      \color{\kklv@set@color}%
+      \directlua{KKLuaVerb.decode([[#1]])}%
+    \endgroup%
+  \else% i
+    % in toc
+    \noexpand\KKlvStart*#1\noexpand\KKlvEnd*%
+  \fi%
 }
 \directlua{
   luatexbase.add_to_callback("process_input_buffer",
