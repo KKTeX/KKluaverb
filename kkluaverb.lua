@@ -1,8 +1,8 @@
 -- KKluaverb.lua
 --
 -- This package utilizes logic from 'bxrawstr' (by Takayuki YATO).
--- https://github.com/zr-tex8r/bxrawstr
---
+-- package: https://gist.github.com/zr-tex8r/c7901658a866adfcd3cd66b6dfa86997
+-- article: https://zrbabbler.hatenablog.com/entry/20181222/1545495849
 -- Copyright (c) 2018 Takayuki YATO (aka. "ZR")
 -- Released under the MIT License.
 --
@@ -25,7 +25,10 @@ function KKV.encode(str)
   if not str then return "" end
   local t = {}
   for _, code in utf8.codes(str) do
-    if ((code >= 48 and code <= 57) or (code >= 65 and code <= 90) or (code >= 97 and code <= 122)) and code ~= 42 then
+    if ((code >= 48 and code <= 57)
+      or (code >= 65 and code <= 90)
+      or (code >= 97 and code <= 122))
+      and code ~= 42 then
       table.insert(t, string.char(code))
     else
       local formatted
@@ -88,7 +91,6 @@ function KKV.scanner(line)
         in_process = false
         pos = e_idx + 1
       else
-        -- 行をまたぐ場合
         table.insert(res, KKV.encode_tail(line:sub(pos)) .. "%")
         break
       end
