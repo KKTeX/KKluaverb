@@ -17,10 +17,11 @@ luatexbase.provides_module{
 local KKV = {}
 local in_process = false
 
-local CMD_INIT = "\\KKvS*"
-local CMD_TERM = "\\KKvE*"
+local CMD_INIT = "\\KKlvStart*"
+local CMD_TERM = "\\KKlvEnd*"
 local ltjflg = utf8.char(0xFFFFF) .. "\n$"
 
+-- encode
 function KKV.encode(str)
   if not str then return "" end
   local t = {}
@@ -50,6 +51,13 @@ function KKV.encode_tail(str)
   return KKV.encode(s)
 end
 
+-- replacement
+KKV.replacements = {}
+function KKV.add_replacement(from_char, to_char)
+    KKV.replacements[from_char] = to_char
+end
+
+-- decode
 function KKV.decode(rstr)
   local cleaned = rstr:gsub('[ \t\r\n]', '')
   local chex = function(s) return utf8.char(tonumber(s, 16)) end
@@ -58,11 +66,16 @@ function KKV.decode(rstr)
     :gsub('*u(%x%x%x%x)', chex)
     :gsub('*(%x%x)', chex)
 
+  for from, to in pairs(KKV.replacements) do
+    decoded = decoded:gsub(from, to)
+  end
+
   decoded = decoded:gsub('\n', '') 
 
   tex.sprint(-2, decoded)
 end
 
+-- scanner
 function KKV.scanner(line)
   local spec = tex.gettoks("kklv@delims")
   local ini_raw, trm_raw = spec:match("^{(.*)}{(.*)}$")
