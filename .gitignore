@@ -1,0 +1,5 @@
+*.ltjruby
+.DS_Store
+
+test.tex
+test.pdf
