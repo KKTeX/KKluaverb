@@ -32,6 +32,11 @@
 \newtoks\kklv@delims
 \newcommand{\KKvSetDelims}[2]{%
   \kklv@delims{{#1}{#2}}%
+  \directlua{
+    if not KKLuaVerb.check_delimiters() then
+      tex.print("\\PackageError{KKluaverb}{Invalid Delimiters}{Use non-alphanumeric characters.}")
+    end
+  }%
 }
 \KKvSetDelims{|}{|}
 

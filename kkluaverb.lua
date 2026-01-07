@@ -5,29 +5,29 @@ luatexbase.provides_module{
   version  = '1.2.0',
 }
 
-
--- delm changer
--- escaper
-local function escape_pattern(text)
-    -- escape all
-    return text:gsub("[%(%)%.%%%+%-%*%?%[%]%^%$]", "%%%0")
-end
-
--- use in the scanner
-local function get_current_pattern()
-    -- get delims
-    local spec = tex.gettoks("kklv@delims")
-    -- devide delims
-    local ini, trm = spec:match("^{(.*)}{(.*)}$")
-    
-    ini = ini or "|"
-    trm = trm or "|"
-    
-    return "\\KKverb" .. escape_pattern(ini) .. "(.-)" .. escape_pattern(trm)
-end
-
 -- main
 local KKV = {}
+local in_process = false
+
+function KKV.check_delimiters()
+    local spec = tex.gettoks("kklv@delims")
+    local ini, trm = spec:match("^{(.*)}{(.*)}$")
+    
+    -- prohibit blank
+    if not ini or not trm or ini == "" or trm == "" then
+        return false
+    end
+    
+    -- prohibit numbers and alphabets
+    if ini:match("^[0-9A-Za-z]") or trm:match("[0-9A-Za-z]$") then
+        return false 
+    end
+
+    -- if the result is false, 
+    -- \KKvSetDelims returns error
+    
+    return true
+end
 
 -- 1. encode
 function KKV.encode(str)
@@ -66,18 +66,52 @@ function KKV.decode(rstr)
         :gsub('*u(%x%x%x%x)', chex)
         :gsub('*(%x%x)', chex)
 
-    tex.sprint(decoded)
+    tex.sprint(-2, decoded)
 end
 
 -- 3. scan
 function KKV.scanner(line)
-    local pattern = get_current_pattern()
+    -- Get delimiters from TeX token register
+    local spec = tex.gettoks("kklv@delims")
+    local ini_raw, trm_raw = spec:match("^{(.*)}{(.*)}$")
+    local ini = ini_raw or "|"
+    local trm = trm_raw or "|"
 
-    -- encode
-    return line:gsub(pattern, function(content)
-        return "\\KKvPrint{" .. KKLuaVerb.encode(content) .. "}"
-    end)
-    -- \KKvPrint decodes (refer to .sty file)
+    local pos = 1
+    local res = {} 
+    local start_cmd = "\\KKverb" .. ini
+
+    while pos <= #line do
+        if not in_process then
+            local s_idx, e_idx = line:find(start_cmd, pos, true)
+            
+            if s_idx then
+                table.insert(res, line:sub(pos, s_idx - 1))
+                table.insert(res, "\\KKvPrint{")
+                in_process = true
+                pos = e_idx + 1
+            else
+                table.insert(res, line:sub(pos))
+                break
+            end
+        else
+            local s_idx, e_idx = line:find(trm, pos, true)
+            
+            if s_idx then
+                local content = line:sub(pos, s_idx - 1)
+                table.insert(res, KKV.encode(content) .. "}")
+                in_process = false
+                pos = e_idx + 1
+            else
+                local content = line:sub(pos)
+                table.insert(res, KKV.encode(content .. ""))
+                break
+            end
+        end
+    end
+
+    -- Return a flat string without raw newline characters
+    return table.concat(res)
 end
 
 -- make KKV global
