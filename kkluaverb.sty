@@ -48,7 +48,6 @@
 }
 \KKvSetDelims{|}{|}
 
-% main
 \NewDocumentCommand{\KKvPrint}{ m }{%
   \begingroup%
     \kklv@set@font%
@@ -60,7 +59,5 @@
 \directlua{
   luatexbase.add_to_callback("process_input_buffer", KKLuaVerb.scanner, "kkluaverb_scanner")
 }
-
-\newcommand{\KKverb}{} 
 
 \endinput

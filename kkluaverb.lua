@@ -31,6 +31,8 @@ end
 
 -- 1. Encode
 function KKV.encode(str)
+  str = str:gsub('[ \t\r\n]', '')
+
   -- utf8.codes
   local t = {}
   for _, code in utf8.codes(str) do
@@ -55,6 +57,10 @@ function KKV.encode(str)
   return table.concat(t)
 end
 
+function KKV.encode_tail(str)
+  return KKV.encode(str .. "\n")
+end
+
 -- 2. Decode
 function KKV.decode(rstr)
   local chex = function(s) return utf8.char(tonumber(s, 16)) end
@@ -62,72 +68,54 @@ function KKV.decode(rstr)
     :gsub('*U(%x%x%x%x%x%x)', chex)
     :gsub('*u(%x%x%x%x)', chex)
     :gsub('*(%x%x)', chex)
-
-  -- test
-  -- local txt = decoded:gsub("\n%s*", ""):gsub("%s*\n", "")
-  --
-
   tex.sprint(-2, decoded)
 end
 
 -- 3. Scan
 function KKV.scanner(line)
-    -- Get delimiters from TeX token register
-    local spec = tex.gettoks("kklv@delims")
-    local ini_raw, trm_raw = spec:match("^{(.*)}{(.*)}$")
-    local ini = ini_raw or "|"
-    local trm = trm_raw or "|"
+  -- Get delimiters from TeX token register
+  local spec = tex.gettoks("kklv@delims")
+  local ini_raw, trm_raw = spec:match("^{(.*)}{(.*)}$")
+  local ini = ini_raw or "|"
+  local trm = trm_raw or "|"
 
-    local pos = 1
-    local res = {} 
-    local start_cmd = "\\KKverb" .. ini
+  local pos = 1
+  local res = {} 
+  local start_cmd = "\\KKverb" .. ini
 
-    while pos <= #line do
-      if not in_process then
-        local s_idx, e_idx = line:find(start_cmd, pos, true)
-        
-        if s_idx then
-          table.insert(res, line:sub(pos, s_idx - 1))
-          table.insert(res, "\\KKvPrint{")
-          in_process = true
-          pos = e_idx + 1
-        else
-          table.insert(res, line:sub(pos))
-          break
-        end
+  while pos <= #line do
+    if not in_process then
+      local s_idx, e_idx = line:find(start_cmd, pos, true)
+      
+      if s_idx then
+        table.insert(res, line:sub(pos, s_idx - 1))
+        table.insert(res, "\\KKvPrint{")
+        in_process = true
+        pos = e_idx + 1
       else
-        -- test
-        if pos == 1 then
-          line = line:gsub("^%s+", "")
-        end
-        --
+        table.insert(res, line:sub(pos))
+        break
+      end
+    else
 
-        local s_idx, e_idx = line:find(trm, pos, true)
-        
-        if s_idx then
-          local content = line:sub(pos, s_idx - 1)
-          table.insert(res, KKV.encode(content) .. "}")
-          in_process = false
-          pos = e_idx + 1
-        else
-          local content = line:sub(pos)
+      local s_idx, e_idx = line:find(trm, pos, true)
+      
+      if s_idx then
+        local content = line:sub(pos, s_idx - 1)
+        table.insert(res, KKV.encode(content) .. "}")
+        in_process = false
+        pos = e_idx + 1
+      else
+        local content = line:sub(pos)
 
-          -- test
-          if pos == 1 then
-            line = line:gsub("^%s+", "")
-          end
-          --
-
-          table.insert(res, KKV.encode(content) 
-          .. "%"
-          )
-          break
-        end
+        table.insert(res, KKV.encode_tail(content) .. "%")
+        break
       end
     end
+  end
 
-    -- Return a flat string without raw newline characters
-    return table.concat(res)
+  -- Return a flat string without raw newline characters
+  return table.concat(res)
 end
 
 -- Make KKV global
