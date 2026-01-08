@@ -30,6 +30,22 @@
 \KKvSetLineBreak{0}
   % If the op is 1, the line break appears as real linebreak.
   % If the op is 0, the line break appears as nothing.
+
+% visualised linenumbers
+\pgfkeys{
+  /kklvlinenumber/.is family, /kklvlinenumber/.cd,
+  font/.store in  = \kklvlinenumber@set@font,
+  color/.store in = \kklvlinenumber@set@color,
+  size/.store in = \kklvlinenumber@set@size
+}
+\newcommand{\KKvLNChange}[1]{\pgfkeys{/kklvlinenumber/.cd, #1}}
+\KKvLNChange{font=\ttfamily, color=black!80, size=\small}
+\newcommand{\KKlvLineNumber}[1]{{%
+  \kklvlinenumber@set@font%
+  \color{\kklvlinenumber@set@color}%
+  \kklvlinenumber@set@size%
+  #1%
+}}
 %%%
 
 %%% replacer
