@@ -75,12 +75,25 @@ function KKV.decode(rstr)
 
   local lb_flag = tex.gettoks("kklv@linebreak")
   if lb_flag == "1" then
-    tex.sprint("\\par\\noindent ") 
+    local dc_lines = {}
     for line in (decoded .. "\n"):gmatch("(.-)\n") do
-      if line ~= "" then
-        tex.sprint(-2, line)
+      table.insert(dc_lines, line)
+    end
+    local last_idx = #dc_lines
+    if dc_lines[last_idx] == "" then
+      last_idx = last_idx - 1
+    end
+    tex.sprint("\\noindent")
+    for i = 1, last_idx do
+      local content = dc_lines[i]
+      if content ~= "" then
+        tex.sprint(-2, content)
       end
-      tex.sprint("\\par\\noindent ") 
+      if i < last_idx then
+        tex.sprint("\\hfill\\break\\noindent")
+      else
+        tex.sprint("\\hspace*{\\fill}\\par")
+      end
     end
   else
     decoded = decoded:gsub('[\t\r\n]', '') 
