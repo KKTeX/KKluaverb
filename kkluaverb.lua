@@ -83,7 +83,7 @@ function KKV.decode(rstr)
     if dc_lines[last_idx] == "" then
       last_idx = last_idx - 1
     end
-    tex.sprint("\\noindent")
+    tex.sprint("\\par\\noindent")
     for i = 1, last_idx do
       local content = dc_lines[i]
       if content ~= "" then
