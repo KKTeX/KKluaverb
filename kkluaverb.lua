@@ -70,9 +70,6 @@ function KKV.decode(rstr)
     decoded = decoded:gsub(from, to)
   end
 
-  -- decoded = decoded:gsub('[\t\r\n]', '') 
-  -- tex.sprint(-2, decoded)
-
   local lb_flag = tex.gettoks("kklv@linebreak")
   if lb_flag == "1" then
     local dc_lines = {}
