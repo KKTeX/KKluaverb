@@ -70,7 +70,11 @@ function KKV.decode(rstr)
     decoded = decoded:gsub(from, to)
   end
 
+  -- How to process linebreak
   local lb_flag = tex.gettoks("kklv@linebreak")
+  
+  -- If lb_flag is "1",
+  -- a "verbatim paragraph" is produced.
   if lb_flag == "1" then
     local dc_lines = {}
     for line in (decoded .. "\n"):gmatch("(.-)\n") do
@@ -92,6 +96,35 @@ function KKV.decode(rstr)
         tex.sprint("\\hspace*{\\fill}\\par")
       end
     end
+
+  -- If lb_flag is "2",
+  -- a "verbatim paragraph with line numbers"
+  -- is produced.
+  elseif lb_flag == "2" then
+    local dc_lines = {}
+    for line in (decoded .. "\n"):gmatch("(.-)\n") do
+      table.insert(dc_lines, line)
+    end
+    local last_idx = #dc_lines
+    if dc_lines[last_idx] == "" then
+      last_idx = last_idx - 1
+    end
+    tex.sprint("\\par\\noindent") 
+    for i = 1, last_idx do
+      tex.sprint("\\KKlvLineNumber{" .. i .. "}")
+      local content = dc_lines[i]
+      if content ~= "" then
+        tex.sprint(-2, content)
+      end
+      if i < last_idx then
+        tex.sprint("\\hfill\\break\\noindent")
+      else
+        tex.sprint("\\hspace*{\\fill}\\par")
+      end
+    end
+
+  -- If lb_flag is not "1" or "2",
+  -- any linebreaks are completely ignored.
   else
     decoded = decoded:gsub('[\t\r\n]', '') 
     tex.sprint(-2, decoded)
