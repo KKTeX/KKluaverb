@@ -1,0 +1,66 @@
+\documentclass{ltjsarticle}
+\usepackage{luwa-ul}
+\usepackage{KKluaverb}
+\usepackage{tabularray, booktabs, array}
+\usepackage{makeidx}
+
+\KKvSetMap{ }{␣}
+\KKvSetMap{。}{．}
+\KKvSetMap{、}{，}
+
+\begin{document}
+
+\tableofcontents
+\listoftables
+
+\section{\KKverb|\underLineKK|との複合テスト}
+
+\underLineKK{\KKverb|あ あ。和文の下線テスト。|}
+
+{%
+\KKvSetLineBreak{2}%
+\underLineKK{いいいい\KKverb|あ あ。
+改行しても「あ」が「い」になり、
+句点がドットになり、スペースが可視化されるか。|あああああ}}
+
+\section{表・複雑な構造でのテスト}
+
+\begin{table}[h]
+\caption{\KKverb|\KKluaverb|動作検証用テーブル}
+\centering
+\begin{tabular}{@{}>{\color{red}}l p{10cm}@{}}
+\toprule
+テスト項目 & 表示結果 \\ \midrule
+インライン & \verb|const x = "あ あ";| \\
+下線＋色 & \underLineKK{\KKvOpChange{color=orange}\KKverb|orange under line|}\\
+置換連鎖 & \KKverb|あ。あ。あ。|（「い．い．い．」になれば成功） \\ \bottomrule
+\end{tabular}
+\end{table}
+
+
+\begin{tblr}{hlines, vlines, colspec={X[l]}}
+  \underLineKK{\KKverb|ここでも
+  繋がるかな？|} \\
+  {
+    次のセルとの境界テスト：
+    \underLineKK{\KKverb|あああ
+    いいい|}
+  }
+\end{tblr}
+
+\begin{itemize}
+  \item[\KKverb|\foo|] ああああ
+  \item[\KKverb|\Foo%|] ああああ
+\end{itemize}
+
+\section{索引のテスト}
+ここでの単語を索引に登録します：\KKverb|index_test| \index{index@\KKverb|index_test|}
+
+句点を含む索引：\KKverb|句点。テスト| \index{くてん@\KKverb|句点。テスト|}
+
+\underLineKK{\KKverb|下線付き索引|} \index{かせん@\underLineKK{\KKverb|下線付き索引|}}
+
+バックスラッシュを含む：\index{めいれい@\KKverb|\foo\bar|}
+
+\printindex 
+\end{document}

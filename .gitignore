@@ -1,5 +1,17 @@
-*.ltjruby
+## OS X
 .DS_Store
+.AppleDouble
+.LSOverride
+Icon
 
-test.tex
-test.pdf
+## unnecessary files
+*.xbb
+*.ps
+*.dvi
+*.out
+*.aux
+*.log
+*.lot
+*.toc
+*.ltjruby
+*.synctex.*
