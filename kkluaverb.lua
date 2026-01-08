@@ -11,7 +11,7 @@
 luatexbase.provides_module{
   name     = 'KKluaverb',
   date     = '2026/01/08',
-  version  = '1.3.0',
+  version  = '1.4.0',
 }
 
 local KKV = {}
