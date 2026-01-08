@@ -59,7 +59,7 @@ end
 
 -- decode
 function KKV.decode(rstr)
-  local cleaned = rstr:gsub('[ \t\r\n]', '')
+  local cleaned = rstr
   local chex = function(s) return utf8.char(tonumber(s, 16)) end
   local decoded = cleaned
     :gsub('*U(%x%x%x%x%x%x)', chex)
@@ -70,14 +70,28 @@ function KKV.decode(rstr)
     decoded = decoded:gsub(from, to)
   end
 
-  decoded = decoded:gsub('\n', '') 
+  -- decoded = decoded:gsub('[\t\r\n]', '') 
+  -- tex.sprint(-2, decoded)
 
-  tex.sprint(-2, decoded)
+  local lb_flag = tex.gettoks("kklv@linebreak")
+  if lb_flag == "1" then
+    tex.sprint("\\par\\noindent ") 
+    for line in (decoded .. "\n"):gmatch("(.-)\n") do
+      if line ~= "" then
+        tex.sprint(-2, line)
+      end
+      tex.sprint("\\par\\noindent ") 
+    end
+  else
+    decoded = decoded:gsub('[\t\r\n]', '') 
+    tex.sprint(-2, decoded)
+  end
 end
 
 -- scanner
 function KKV.scanner(line)
   local spec = tex.gettoks("kklv@delims")
+
   local ini_raw, trm_raw = spec:match("^{(.*)}{(.*)}$")
   local ini = ini_raw or "|"
   local trm = trm_raw or "|"
@@ -104,7 +118,8 @@ function KKV.scanner(line)
         in_process = false
         pos = e_idx + 1
       else
-        table.insert(res, KKV.encode_tail(line:sub(pos)) .. "%")
+        local sc_content = line:sub(pos)
+        table.insert(res, KKV.encode_tail(sc_content) .. "%")
         break
       end
     end

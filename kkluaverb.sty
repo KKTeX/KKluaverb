@@ -24,6 +24,14 @@
 \KKvSetDelims{|}{|}
 %%%
 
+%%% linebreak op
+\newtoks\kklv@linebreak
+\newcommand{\KKvSetLineBreak}[1]{\kklv@linebreak={#1}}
+\KKvSetLineBreak{0}
+  % If the op is 1, the line break appears as real linebreak.
+  % If the op is 0, the line break appears as nothing.
+%%%
+
 %%% replacer
 \def\kklv@lua@str#1{"\luatexluaescapestring{#1}"}
 \newcommand{\KKvSetMap}[2]{%
@@ -37,9 +45,11 @@
     \begingroup%
       \kklv@set@font%
       \color{\kklv@set@color}%
-      \directlua{KKLuaVerb.decode([[#1]])}%
+      \directlua{
+        KKLuaVerb.decode([[#1]])
+      }%
     \endgroup%
-  \else% i
+  \else% 
     % in toc
     \noexpand\KKlvStart*#1\noexpand\KKlvEnd*%
   \fi%
