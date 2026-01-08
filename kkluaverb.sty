@@ -26,10 +26,24 @@
 
 %%% linebreak op
 \newtoks\kklv@linebreak
-\newcommand{\KKvSetLineBreak}[1]{\kklv@linebreak={#1}}
+\newcommand{\KKvSetLineBreak}[1]{%
+  \ifnum#1<0 \kklv@error@invalidlb{#1}\else
+  \ifnum#1>2 \kklv@error@invalidlb{#1}\else
+    % 正常な場合のみ代入
+    \kklv@linebreak={#1}%
+  \fi\fi
+}
+\newcommand{\kklv@error@invalidlb}[1]{%
+  \PackageError{KKluaverb}{%
+    Invalid value '#1' for LineBreak%
+  }{%
+    LineBreak must be 0 (none), 1 (paragraph), or 2 (with line numbers).%
+  }%
+}
 \KKvSetLineBreak{0}
+  % If the op is 0, the line break appears as nothing.  
   % If the op is 1, the line break appears as real linebreak.
-  % If the op is 0, the line break appears as nothing.
+  % If the op is 2, the line break appears as real linebreak and line-number-index.
 
 % visualised linenumbers
 \pgfkeys{
