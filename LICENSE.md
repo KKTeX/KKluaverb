@@ -1,9 +1,16 @@
 # MIT License
 
-**Copyright (c) 2026 Kosei Kawaguchi**
+Author: **Copyright (c) 2026 Kosei Kawaguchi**
 
 ---
 
+## Acknowledgments & Secondary Copyrights
+This software includes code based on work by:
+**Copyright (c) 2018 Takayuki YATO (aka. "ZR")**
+
+---
+
+## Permission Notice
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
 The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.

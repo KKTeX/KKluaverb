@@ -1,12 +1,13 @@
 -- KKluaverb.lua
 --
+-- Copyright (c) 2026 Kosei Kawaguchi 
+--
 -- This package utilizes logic from 'bxrawstr' (by Takayuki YATO).
 -- package: https://gist.github.com/zr-tex8r/c7901658a866adfcd3cd66b6dfa86997
 -- article: https://zrbabbler.hatenablog.com/entry/20181222/1545495849
 -- Copyright (c) 2018 Takayuki YATO (aka. "ZR")
 -- Released under the MIT License.
 --
--- Copyright (c) 2026 Kosei Kawaguchi 
 
 luatexbase.provides_module{
   name     = 'KKluaverb',
