@@ -1,17 +1,20 @@
 # ----- setting ------
 TEST_TARGET = kkluaverb-test
+DOC_TARGET = kkluaverb-doc
 RC     = .latexmkrc
 
 
 # ----- main ------
-.PHONY: all clean distclean pvc zip
-
-# make  = build and clean
-all: build clean
+.PHONY: clean distclean pvc zip builddoc buildtest
 
 # compile
-build:
+builddoc:
+	latexmk -r $(RC) $(DOC_TARGET).tex
+	$(MAKE) clean
+
+buildtest:
 	latexmk -r $(RC) $(TEST_TARGET).tex
+	$(MAKE) clean
 
 # cleaning except for PDF
 clean:
@@ -31,13 +34,13 @@ styFILENAME = KKluaverb
 ZIP_DIR = $(PACKAGE)
 
 # ----- zip generation -----
-zip: distclean build clean
+zip: distclean builddoc
 	mkdir -p $(ZIP_DIR)
 	cp $(styFILENAME).lua $(ZIP_DIR)
 	cp $(styFILENAME).sty $(ZIP_DIR)
 	cp README.md $(ZIP_DIR)
 	cp LICENSE.md $(ZIP_DIR)
-# 	cp $(PACKAGE).tex $(ZIP_DIR)
-# 	cp $(PACKAGE).pdf $(ZIP_DIR)
-	zip -r $(PACKAGE).zip $(ZIP_DIR)
+	cp $(PACKAGE)-doc.tex $(ZIP_DIR)
+	cp $(PACKAGE)-doc.pdf $(ZIP_DIR)
+	zip -r $(PACKAGE).zip $(ZIP_DIR) -x "*/.*" "*~"
 	rm -rf $(ZIP_DIR)

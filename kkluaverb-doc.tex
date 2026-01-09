@@ -1,0 +1,87 @@
+\documentclass[luatex,fontsize=8pt,paper=b5,twoside]{jlreq}%
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs,caption}
+\usepackage{luwa-ul}
+\usepackage{KKsymbols}
+\usepackage[most]{tcolorbox}
+\usepackage{KKluaverb}
+
+
+%%% fonts (This can be omitted.)
+\makeatletter 
+\RequirePackage[no-math]{fontspec}
+\RequirePackage[no-math,match,scale=1]{luatexja-fontspec}
+\RequirePackage[hiragino-pro,deluxe,expert]{luatexja-preset}
+\setmainfont{HiraMinPro-W3}[BoldFont=HiraMinPro-W6]
+\setmainjfont{HiraMinPro-W3}[BoldFont=HiraMinPro-W6]
+\newfontfamily{\sfhira@pre}{HiraKakuPro-W3}[BoldFont=HiraKakuPro-W6]
+\newjfontfamily{\sfhiraj@pre}{HiraKakuPro-W3}[BoldFont=HiraKakuPro-W6]
+\newfontfamily{\mchira@pre}{HiraMinPro-W3}[BoldFont=HiraMinPro-W6]
+\newjfontfamily{\mchiraj@pre}{HiraMinPro-W3}[BoldFont=HiraMinPro-W6]
+\newfontfamily{\gthira@pre}{HiraKakuPro-W3}[BoldFont=HiraKakuPro-W6,FontFace={eb}{\shapedefault}{HiraKakuStd-W8}]
+\newjfontfamily{\gthiraj@pre}{HiraKakuPro-W3}[BoldFont=HiraKakuPro-W6,FontFace={eb}{\shapedefault}{HiraKakuStd-W8}]
+\newfontfamily{\mghira@pre}{HiraMaruPro-W4}
+\newjfontfamily{\mghiraj@pre}{HiraMaruPro-W4}
+\renewcommand{\sffamily}{\sfhira@pre\sfhiraj@pre}
+\renewcommand{\mcfamily}{\mchira@pre\mchiraj@pre}
+\renewcommand{\gtfamily}{\gthira@pre\gthiraj@pre}
+\renewcommand{\mgfamily}{\mghira@pre\mghiraj@pre}
+\makeatother
+%%%
+
+
+%%% hyperref
+\usepackage{hyperref} 
+\hypersetup{
+  luatex, pdfencoding=auto, 
+  colorlinks=true,
+  linkcolor=black,     
+  citecolor=black,     
+  urlcolor=DeepSkyBlue3,      
+  pdfborder={0 0 0}, 
+}
+%%%
+
+
+%%% textboxes
+\makeatletter
+\newcommand{\ascb@parindent}[1]{%
+  \setlength{\parindent}{#1}\relax%
+}
+\def\ascb@gtfamily{\gtfamily}
+\DeclareTColorBox{simple}{ o m O{.5} O{} }% 
+{empty, left=2mm, right=2mm, top=-1mm, 
+attach boxed title to top left={xshift=\ascb@zw{1.2}{11pt}}, 
+boxed title style={empty,left=-2mm,right=-2mm}, colframe=black, coltitle=black, coltext=black, breakable, 
+before upper={\ascb@parindent{\zw}},%%%
+underlay unbroken={\draw[black,line width=#3pt](title.east) -- (title.east-|frame.east) -- (frame.south east) -- (frame.south west) -- (title.west-|frame.west) -- (title.west); },
+underlay first={\draw[black,line width=#3pt](title.east) -- (title.east-|frame.east) -- (frame.south east) ;
+\draw[black,line width=#3pt] (frame.south west) -- (title.west-|frame.west) -- (title.west); },
+underlay middle={\draw[black,line width=#3pt](frame.north east) -- (frame.south east) ;
+\draw[black,line width=#3pt](frame.south west) -- (frame.north west) ;},
+underlay last={\draw[black,line width=#3pt](frame.north east) -- (frame.south east) -- (frame.south west) -- (frame.north west) ;},
+fonttitle=\ascb@gtfamily, IfValueTF={#1}{title=\hspace*{.1em}【#2】〈#1〉\hspace*{.1em}}{title=\hspace*{.1em}【#2】\hspace*{.1em}},#4}
+\makeatother
+%%%
+
+
+%%% titlepage
+\title{\texttt{KKluaverb} Package Documentation}
+\author{Kosei Kawaguchi a.k.a. KKTeX}
+\date{Version 1.4.0 (2026/01/08)}
+%%%
+
+\begin{document}
+%%% title and toc
+\begin{titlepage}
+  \maketitle
+\end{titlepage}
+\newpage
+\tableofcontents
+\newpage
+%%%
+
+\section{Outline}
+\KKverb|KKluaverb| is a LaTeX package which provides a Lua-enhanced \KKverb|\verb| command, \KKverb|\KKverb|. It can be used in the table of contents, index, underline commands (e.g., \KKverb|\underLineKK| provided by the luwa-ul package), \KKverb|tblr| environment and so on.
+\end{document}
+
