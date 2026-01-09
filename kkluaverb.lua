@@ -26,13 +26,14 @@ local ltjflg = utf8.char(0xFFFFF) .. "\n$"
 function KKV.encode(str)
   if not str then return "" end
   local t = {}
-  for _, code in utf8.codes(str) do
-    if ((code >= 48 and code <= 57)
-      or (code >= 65 and code <= 90)
-      or (code >= 97 and code <= 122))
-      and code ~= 42 then
+  for _, code in utf8.codes(str) do     -- discard pos
+    if ((code >= 48 and code <= 57)     -- 0-9
+      or (code >= 65 and code <= 90)    -- A-Z
+      or (code >= 97 and code <= 122))  -- a-z
+      and code ~= 42 then               -- except for '*'
       table.insert(t, string.char(code))
     else
+      -- Transform the input into hexadecimal.
       local formatted
       if code < 0x100 then
         formatted = string.format("*%02X", code)
@@ -55,18 +56,18 @@ end
 -- replacement
 KKV.replacements = {}
 function KKV.add_replacement(from_char, to_char)
-    KKV.replacements[from_char] = to_char
+  KKV.replacements[from_char] = to_char
 end
 
 -- decode
 function KKV.decode(rstr)
-  local cleaned = rstr
   local chex = function(s) return utf8.char(tonumber(s, 16)) end
-  local decoded = cleaned
+  local decoded = rstr
     :gsub('*U(%x%x%x%x%x%x)', chex)
     :gsub('*u(%x%x%x%x)', chex)
     :gsub('*(%x%x)', chex)
 
+  -- After characters are decoded, run the replacer.
   for from, to in pairs(KKV.replacements) do
     decoded = decoded:gsub(from, to)
   end
@@ -103,6 +104,8 @@ function KKV.decode(rstr)
   -- is produced.
   elseif lb_flag == "2" then
     local dc_lines = {}
+
+    -- Separate 'decoded' to 'dc_lines'.
     for line in (decoded .. "\n"):gmatch("(.-)\n") do
       table.insert(dc_lines, line)
     end
@@ -134,22 +137,33 @@ end
 
 -- scanner
 function KKV.scanner(line)
+  -- When the process_input_buffer runs,
+  -- a chunk of text on a single line
+  -- is passed to the function as the argument `line`
+
   local spec = tex.gettoks("kklv@delims")
 
+  -- In the .sty, \kklv@delims is defined
+  -- as {token1}{token2}.
+  -- So cut off the brackets.
   local ini_raw, trm_raw = spec:match("^{(.*)}{(.*)}$")
   local ini = ini_raw or "|"
   local trm = trm_raw or "|"
 
-  local pos = 1
-  local res = {} 
+  local pos = 1 -- the character index
+  local res = {} -- a transformed chunk
   local start_cmd = "\\KKverb" .. ini
 
-  while pos <= #line do
+  -- While the character index 
+  -- <= the length of the line,
+  -- scan the chunk:
+  while pos <= #line do 
     if not in_process then
       local s_idx, e_idx = line:find(start_cmd, pos, true)
       if s_idx then
+        -- Found the starter
         table.insert(res, line:sub(pos, s_idx - 1) .. CMD_INIT)
-        in_process = true
+        in_process = true 
         pos = e_idx + 1
       else
         table.insert(res, line:sub(pos))
@@ -158,8 +172,9 @@ function KKV.scanner(line)
     else
       local s_idx, e_idx = line:find(trm, pos, true)
       if s_idx then
+        -- Found the finisher
         table.insert(res, KKV.encode(line:sub(pos, s_idx - 1)) .. CMD_TERM)
-        in_process = false
+        in_process = false 
         pos = e_idx + 1
       else
         local sc_content = line:sub(pos)

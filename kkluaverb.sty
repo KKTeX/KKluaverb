@@ -73,6 +73,9 @@
 %%%
 
 %%% main
+% When the scanned chunk includes
+% a \KKlvStart*<text>\KKlvEnd* part,
+% it is transformed as follows:
 \def\KKlvStart*#1\KKlvEnd*{%
   \ifx\protect\relax%
     \begingroup%
@@ -83,13 +86,17 @@
       }%
     \endgroup%
   \else% 
-    % in toc
+    % in .toc
     \noexpand\KKlvStart*#1\noexpand\KKlvEnd*%
   \fi%
 }
+% Run KKLuaVerb.scanner on each line.
 \directlua{
-  luatexbase.add_to_callback("process_input_buffer",
-  KKLuaVerb.scanner, "kkluaverb_scanner")
+  luatexbase.add_to_callback(
+    "process_input_buffer",
+    KKLuaVerb.scanner, 
+    "kkluaverb_scanner"
+  )
 }
 \newcommand{\KKverb}{} 
 %%%
