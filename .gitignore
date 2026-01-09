@@ -13,5 +13,8 @@ Icon
 *.log
 *.lot
 *.toc
+*.idx
+*.ilg
+*.ind
 *.ltjruby
 *.synctex.*

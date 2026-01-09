@@ -3,10 +3,31 @@
 \usepackage{KKluaverb}
 \usepackage{tabularray, booktabs, array}
 \usepackage{makeidx}
+\usepackage[most]{tcolorbox}
+
+\makeatletter
+\newcommand{\ascb@parindent}[1]{%
+  \setlength{\parindent}{#1}\relax%
+}
+\def\ascb@zw#1#2{#1\zw}
+\def\ascb@gtfamily{\gtfamily}
+\DeclareTColorBox{simple}{ o m O{.5} O{} }% 
+{empty, left=2mm, right=2mm, top=-1mm, attach boxed title to top left={xshift=\ascb@zw{1.2}{11pt}}, boxed title style={empty,left=-2mm,right=-2mm}, colframe=black, coltitle=black, coltext=black, breakable, 
+before upper={\ascb@parindent{\zw}},%%%
+underlay unbroken={\draw[black,line width=#3pt](title.east) -- (title.east-|frame.east) -- (frame.south east) -- (frame.south west) -- (title.west-|frame.west) -- (title.west); },
+underlay first={\draw[black,line width=#3pt](title.east) -- (title.east-|frame.east) -- (frame.south east) ;
+\draw[black,line width=#3pt] (frame.south west) -- (title.west-|frame.west) -- (title.west); },
+underlay middle={\draw[black,line width=#3pt](frame.north east) -- (frame.south east) ;
+\draw[black,line width=#3pt](frame.south west) -- (frame.north west) ;},
+underlay last={\draw[black,line width=#3pt](frame.north east) -- (frame.south east) -- (frame.south west) -- (frame.north west) ;},
+fonttitle=\ascb@gtfamily, IfValueTF={#1}{title=\hspace*{.1em}【#2】〈#1〉\hspace*{.1em}}{title=\hspace*{.1em}【#2】\hspace*{.1em}},#4}
+\makeatother
 
 \KKvSetMap{ }{␣}
 \KKvSetMap{。}{．}
 \KKvSetMap{、}{，}
+
+\makeindex
 
 \begin{document}
 
@@ -62,5 +83,17 @@
 
 バックスラッシュを含む：\index{めいれい@\KKverb|\foo\bar|}
 
+\section{テキストボックスのテスト}
+\begin{simple}{タイトル}
+  {%
+  \KKvSetLineBreak{2}%
+  いいいい\KKverb|あ あ。
+  改行しても「あ」が「い」になり、
+  句点がドットになり、スペースが可視化されるか。|%
+  あああああ
+  }
+\end{simple}
+
 \printindex 
+
 \end{document}
