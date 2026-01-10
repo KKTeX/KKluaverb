@@ -76,7 +76,7 @@
 % When the scanned chunk includes
 % a \KKlvStart*<text>\KKlvEnd* part,
 % it is transformed as follows:
-\def\KKlvStart*#1\KKlvEnd*{%
+\long\def\KKlvStart*#1\KKlvEnd*{%
   \ifx\protect\relax%
     \begingroup%
       \kklv@set@font%
@@ -100,5 +100,4 @@
 }
 \newcommand{\KKverb}{} 
 %%%
-
 \endinput
