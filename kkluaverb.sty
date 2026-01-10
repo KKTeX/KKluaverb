@@ -67,9 +67,9 @@
 
 %%% replacer
 \def\kklv@lua@str#1{"\luatexluaescapestring{#1}"}
-\newcommand{\KKvSetMap}[2]{%
+\newcommand{\KKvSetMap}[2]{{%
   \directlua{KKLuaVerb.add_replacement(\kklv@lua@str{#1}, \kklv@lua@str{#2})}%
-}
+}}
 %%%
 
 %%% main
