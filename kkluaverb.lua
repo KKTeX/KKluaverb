@@ -115,7 +115,7 @@ function KKV.decode(rstr)
     end
     tex.sprint("\\par\\noindent") 
     for i = 1, last_idx do
-      tex.sprint("\\KKlvLineNumber{" .. i .. "}")
+      tex.sprint("\\KKlvLineNumber{" .. i .. "}\\inhibitglue")
       local content = dc_lines[i]
       if content ~= "" then
         tex.sprint(-2, content)

@@ -1,5 +1,6 @@
 # ----- setting ------
 TEST_TARGET = kkluaverb-test
+TEST_TARGET1 = kkluaverb-test1
 DOC_TARGET = kkluaverb-doc
 RC     = .latexmkrc
 
@@ -14,6 +15,10 @@ builddoc:
 
 buildtest:
 	latexmk -r $(RC) $(TEST_TARGET).tex
+	$(MAKE) clean
+
+buildtest1:
+	latexmk -r $(RC) $(TEST_TARGET1).tex
 	$(MAKE) clean
 
 # cleaning except for PDF
