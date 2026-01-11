@@ -57,11 +57,14 @@
 }
 \newcommand{\KKvLNChange}[1]{\pgfkeys{/kklvlinenumber/.cd, #1}}
 \KKvLNChange{font=\ttfamily, color=black!80, size=\small}
+% Upper limit of the line number is 6 digits.
 \newcommand{\KKlvLineNumber}[1]{{%
   \kklvlinenumber@set@font%
   \color{\kklvlinenumber@set@color}%
   \kklvlinenumber@set@size%
-  #1%
+  \llap{%
+    \makebox[3em][r]{#1}\phantom{l}%
+  }\inhibitglue%
 }}
 %%%
 

@@ -78,6 +78,7 @@ function KKV.decode(rstr)
   
   -- If lb_flag is "1",
   -- a "verbatim paragraph" is produced.
+  -- Behave like an environment.
   if lb_flag == "1" then
     local dc_lines = {}
     for line in (decoded .. "\n"):gmatch("(.-)\n") do
@@ -103,6 +104,7 @@ function KKV.decode(rstr)
   -- If lb_flag is "2",
   -- a "verbatim paragraph with line numbers"
   -- is produced.
+  -- Behave like an environment.
   elseif lb_flag == "2" then
     local dc_lines = {}
 
@@ -114,9 +116,9 @@ function KKV.decode(rstr)
     if dc_lines[last_idx] == "" then
       last_idx = last_idx - 1
     end
-    tex.sprint("\\par\\noindent") 
+    tex.sprint("\\par\\noindent")
     for i = 1, last_idx do
-      tex.sprint("\\KKlvLineNumber{" .. i .. "}\\inhibitglue")
+      tex.sprint("\\KKlvLineNumber{" .. i .. "}")
       local content = dc_lines[i]
       if content ~= "" then
         tex.sprint(-2, content)
@@ -158,7 +160,7 @@ function KKV.scanner(line)
   -- While the character index 
   -- <= the length of the line,
   -- scan the chunk:
-  while pos <= #line do 
+  while (pos <= #line) or (in_process and pos == 1 and #line == 0) do
     if not in_process then
       local s_idx, e_idx = line:find(start_cmd, pos, true)
       if s_idx then

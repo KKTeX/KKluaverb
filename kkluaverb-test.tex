@@ -64,21 +64,20 @@
 \section{Complex Structures (Tables \& Lists)}
 
 \begin{table}[h]
-\caption{移動引数テスト: \KKverb|Caption \ # %|}
-\centering
-\begin{tblr}{
-  colspec={Q[m,c] X[l]},
-  hlines, vlines,
-  row{1}={bg=gray9, font=\bfseries}
-}
-項 & テスト内容 \\
-1 & \KKverb|Standard Verb| \\
-2 & \underLineKK{\KKverb|Underlined Verb in Table|} \\
-3 & {\KKvSetLineBreak{2}\KKverb|Line 1
-Line 2 with space
-Line 3|} \\
-4 & \KKverb|Special Chars: { } [ ] < > ( )| \\
-\end{tblr}
+  \caption{移動引数テスト: \KKverb|Caption \ # %|}
+  \begin{tblr}{
+    colspec={Q[m,c] X[l,m]}, % X列に m (middle) を追加。これで段落モードが有効になります
+    hlines, vlines,
+    row{1}={bg=gray9, font=\bfseries}
+  }
+  項 & テスト内容 \\
+  1 & \KKverb|Standard Verb| \\
+  2 & \underLineKK{\KKverb|Underlined Verb in Table|} \\
+  3 & {\KKvSetLineBreak{2}\KKverb|Line 1
+  Line 2 with space
+  Line 3|} \\
+  4 & \KKverb|Special Chars: { } [ ] < > ( )| \\
+  \end{tblr}
 \end{table}
 
 \begin{itemize}
@@ -90,16 +89,28 @@ Line 3|} \\
 
 %%% Remain to be enhanced...
 \begin{simple}{Multi-language Code Test}
+ああああああああああああああああああああ
+ああああああああああああああああああああ
+ああああああああああああああああああああ
+ああああああああああああああああああああ%
 {\KKvSetLineBreak{2}%
 \KKverb|function hello() {
-  print("こんにちは、世界。"); -- space check
-  return A + 1; !
+print("こんにちは、世界。"); -- space check
+return A + 1; !
 }
 
 -- Testing Long Sentence
 This is a long sentence that should potentially wrap or be handled by the line break settings of the package. 
 和文と英文が混ざった状態で。句点。と、読点、の置換。
-| }
+ただの和文のテストコード。
+ここにグルーが入ってズレてほしくない。
+abcみたいな英字でも、
+123みたいな数字でも。
+|}
+ああああああああああああああああああああ
+ああああああああああああああああああああ
+ああああああああああああああああああああ
+ああああああああああああああああああああ%
 \end{simple}
 
 \section{Indexing Strategy Test}
