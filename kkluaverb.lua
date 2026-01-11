@@ -93,6 +93,8 @@ function KKV.decode(rstr)
       local content = dc_lines[i]
       if content ~= "" then
         tex.sprint(-2, content)
+      else
+        tex.sprint("\\hbox{}")
       end
       if i < last_idx then
         tex.sprint("\\hfill\\break\\noindent")
