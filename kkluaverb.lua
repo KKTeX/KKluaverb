@@ -94,7 +94,9 @@ function KKV.decode(rstr)
       if content ~= "" then
         tex.sprint(-2, content)
       else
-        tex.sprint("\\hbox{}")
+        if i == 1 then
+          tex.sprint("\\hbox{}")
+        end
       end
       if i < last_idx then
         tex.sprint("\\hfill\\break\\noindent")
