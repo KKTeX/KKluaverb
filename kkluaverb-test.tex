@@ -64,20 +64,21 @@
 \section{Complex Structures (Tables \& Lists)}
 
 \begin{table}[h]
-  \caption{移動引数テスト: \KKverb|Caption \ # %|}
-  \begin{tblr}{
-    colspec={Q[m,c] X[l,m]}, % X列に m (middle) を追加。これで段落モードが有効になります
-    hlines, vlines,
-    row{1}={bg=gray9, font=\bfseries}
-  }
-  項 & テスト内容 \\
-  1 & \KKverb|Standard Verb| \\
-  2 & \underLineKK{\KKverb|Underlined Verb in Table|} \\
-  3 & {\KKvSetLineBreak{2}\KKverb|Line 1
-  Line 2 with space
-  Line 3|} \\
-  4 & \KKverb|Special Chars: { } [ ] < > ( )| \\
-  \end{tblr}
+\caption{移動引数テスト: \KKverb|Caption \ # %|}
+\begin{tblr}{
+  colspec={Q[m,c] X[l,m]}, % X列に m (middle) を追加。これで段落モードが有効になります
+  hlines, vlines,
+  row{1}={bg=gray9, font=\bfseries}
+}
+項 & テスト内容 \\
+1 & \KKverb|Standard Verb| \\
+2 & \underLineKK{\KKverb|Underlined Verb in Table|} \\
+3 & {\KKvSetLineBreak{2}
+\KKverb|Line 1
+Line 2 with space
+Line 3|} \\
+4 & \KKverb|Special Chars: { } [ ] < > ( )| \\
+\end{tblr}
 \end{table}
 
 \begin{itemize}
@@ -105,8 +106,7 @@ This is a long sentence that should potentially wrap or be handled by the line b
 ただの和文のテストコード。
 ここにグルーが入ってズレてほしくない。
 abcみたいな英字でも、
-123みたいな数字でも。
-|}
+123みたいな数字でも。|}
 ああああああああああああああああああああ
 ああああああああああああああああああああ
 ああああああああああああああああああああ
