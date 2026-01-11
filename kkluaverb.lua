@@ -12,8 +12,8 @@
 
 luatexbase.provides_module{
   name     = 'KKluaverb',
-  date     = '2026/01/08',
-  version  = '1.4.0',
+  date     = '2026/01/12',
+  version  = '1.5.0',
 }
 
 local KKV = {}
@@ -89,14 +89,10 @@ function KKV.decode(rstr)
       last_idx = last_idx - 1
     end
     tex.sprint("\\par\\noindent")
-    for i = 1, last_idx do
+    for i = 2, last_idx do
       local content = dc_lines[i]
       if content ~= "" then
         tex.sprint(-2, content)
-      else
-        if i == 1 then
-          tex.sprint("\\hbox{}")
-        end
       end
       if i < last_idx then
         tex.sprint("\\hfill\\break\\noindent")
@@ -121,8 +117,8 @@ function KKV.decode(rstr)
       last_idx = last_idx - 1
     end
     tex.sprint("\\par\\noindent")
-    for i = 1, last_idx do
-      tex.sprint("\\KKlvLineNumber{" .. i .. "}")
+    for i = 2, last_idx do
+      tex.sprint("\\KKlvLineNumber{" .. (i - 1) .. "}")
       local content = dc_lines[i]
       if content ~= "" then
         tex.sprint(-2, content)
@@ -168,10 +164,14 @@ function KKV.scanner(line)
     if not in_process then
       local s_idx, e_idx = line:find(start_cmd, pos, true)
       if s_idx then
-        -- Found the starter
-        table.insert(res, line:sub(pos, s_idx - 1) .. CMD_INIT)
         in_process = true 
+        table.insert(res, line:sub(pos, s_idx - 1) .. CMD_INIT)
         pos = e_idx + 1
+        if not line:find(trm, pos, true) then
+          local sc_content = line:sub(pos)
+          table.insert(res, KKV.encode_tail(sc_content) .. "%")
+          pos = #line + 1 
+        end
       else
         table.insert(res, line:sub(pos))
         break
@@ -179,7 +179,6 @@ function KKV.scanner(line)
     else
       local s_idx, e_idx = line:find(trm, pos, true)
       if s_idx then
-        -- Found the finisher
         table.insert(res, KKV.encode(line:sub(pos, s_idx - 1)) .. CMD_TERM)
         in_process = false 
         pos = e_idx + 1

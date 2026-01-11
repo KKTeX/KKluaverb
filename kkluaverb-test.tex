@@ -74,9 +74,11 @@
 1 & \KKverb|Standard Verb| \\
 2 & \underLineKK{\KKverb|Underlined Verb in Table|} \\
 3 & {\KKvSetLineBreak{2}
-\KKverb|Line 1
+\KKverb|
+Line 1
 Line 2 with space
-Line 3|} \\
+Line 3
+|} \\
 4 & \KKverb|Special Chars: { } [ ] < > ( )| \\
 \end{tblr}
 \end{table}
@@ -89,12 +91,38 @@ Line 3|} \\
 \section{Advanced Multi-line \& Box Stress Test}
 
 %%% Remain to be enhanced...
-\begin{simple}{Multi-language Code Test}
+\begin{simple}{Multi-language Code Test (Numbered)}
 ああああああああああああああああああああ
 ああああああああああああああああああああ
 ああああああああああああああああああああ
 ああああああああああああああああああああ%
 {\KKvSetLineBreak{2}%
+\KKverb|
+function hello() {
+print("こんにちは、世界。"); -- space check
+return A + 1; !
+}
+
+-- Testing Long Sentence
+This is a long sentence that should potentially wrap or be handled by the line break settings of the package. 
+和文と英文が混ざった状態で。句点。と、読点、の置換。
+ただの和文のテストコード。
+ここにグルーが入ってズレてほしくない。
+abcみたいな英字でも、
+123みたいな数字でも。
+|}
+ああああああああああああああああああああ
+ああああああああああああああああああああ
+ああああああああああああああああああああ
+ああああああああああああああああああああ%
+\end{simple}
+
+\begin{simple}{Multi-language Code Test (Not Numbered)}
+ああああああああああああああああああああ
+ああああああああああああああああああああ
+ああああああああああああああああああああ
+ああああああああああああああああああああ%
+{\KKvSetLineBreak{1}%
 \KKverb|
 function hello() {
 print("こんにちは、世界。"); -- space check
