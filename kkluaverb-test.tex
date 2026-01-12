@@ -76,7 +76,7 @@
 項 & テスト内容 \\
 1 & \KKverb|Standard Verb| \\
 2 & \underLineKK{\KKverb|Underlined Verb in Table|} \\
-3 & {\KKvSetLineBreak{2}
+3 & {\KKvLNChange{style=2}%
 \KKverb|
 Line 1
 Line 2 with space
@@ -99,7 +99,7 @@ Line 3
 ああああああああああああああああああああ
 ああああああああああああああああああああ
 ああああああああああああああああああああ%
-{\KKvSetLineBreak{2}%
+{\KKvLNChange{start=15, style=2}%
 \KKverb|
 function hello() { 
 print("こんにちは、世界。"); -- space check
@@ -125,7 +125,7 @@ abcみたいな英字でも、
 ああああああああああああああああああああ
 ああああああああああああああああああああ
 ああああああああああああああああああああ%
-{\KKvSetLineBreak{1}%
+{\KKvLNChange{style=1}%
 \KKverb|
 
 function hello() {

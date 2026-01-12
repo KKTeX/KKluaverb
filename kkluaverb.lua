@@ -21,6 +21,7 @@ local in_process = false
 
 local CMD_INIT = "\\KKlvStart*"
 local CMD_TERM = "\\KKlvEnd*"
+local DEFAULT_STARTER = "\\KKverb"
 local ltjflg = utf8.char(0xFFFFF) .. "\n$"
 
 -- encode
@@ -107,6 +108,7 @@ function KKV.decode(rstr)
   -- Behave like an environment.
   elseif lb_flag == "2" then
     local dc_lines = {}
+    local fl_linenumber = (tex.count["kklv@linenum@start"] - 1)
 
     -- Separate 'decoded' to 'dc_lines'.
     for line in (decoded .. "\n"):gmatch("(.-)\n") do
@@ -118,7 +120,7 @@ function KKV.decode(rstr)
     end
     tex.sprint("\\par\\noindent")
     for i = 2, last_idx do
-      tex.sprint("\\KKlvLineNumber{" .. (i - 1) .. "}")
+      tex.sprint("\\KKlvLineNumber{" .. (i - 1 + fl_linenumber) .. "}")
       local content = dc_lines[i]
       if content ~= "" then
         tex.sprint(-2, content)
@@ -155,7 +157,7 @@ function KKV.scanner(line)
 
   local pos = 1 -- the character index
   local res = {} -- a transformed chunk
-  local start_cmd = "\\KKverb" .. ini
+  local start_cmd = DEFAULT_STARTER .. ini
 
   -- While the character index 
   -- <= the length of the line,

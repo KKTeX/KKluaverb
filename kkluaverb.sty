@@ -23,19 +23,21 @@
 %%%
 
 %%% def delims
+% delimiters
 \newtoks\kklv@delims
 \newcommand{\KKvSetDelims}[2]{\kklv@delims{{#1}{#2}}}
 \KKvSetDelims{|}{|}
+
+% starter command
+\newcommand{\KKverb}{\relax} 
 %%%
 
 %%% linebreak op
+  % If style op is 0, the line break appears as nothing.  
+  % If style is 1, the line break appears as real linebreak.
+  % If style is 2, the line break appears as real linebreak and line-number-index.
+\newcount\kklv@linenum@start
 \newtoks\kklv@linebreak
-\newcommand{\KKvSetLineBreak}[1]{%
-  \ifnum#1<0 \kklv@error@invalidlb{#1}\else
-  \ifnum#1>2 \kklv@error@invalidlb{#1}\else
-    \kklv@linebreak={#1}%
-  \fi\fi
-}
 \newcommand{\kklv@error@invalidlb}[1]{%
   \PackageError{KKluaverb}{%
     Invalid value '#1' for LineBreak%
@@ -43,22 +45,25 @@
     LineBreak must be 0 (none), 1 (paragraph), or 2 (with line numbers).%
   }%
 }
-\KKvSetLineBreak{0}
-  % If the op is 0, the line break appears as nothing.  
-  % If the op is 1, the line break appears as real linebreak.
-  % If the op is 2, the line break appears as real linebreak and line-number-index.
-
-% visualised linenumbers
 \pgfkeys{
   /kklvlinenumber/.is family, /kklvlinenumber/.cd,
   font/.store in  = \kklvlinenumber@set@font,
   color/.store in = \kklvlinenumber@set@color,
-  size/.store in = \kklvlinenumber@set@size
+  size/.store in = \kklvlinenumber@set@size,
+  start/.code = {\kklv@linenum@start=#1},
+  style/.code = {%
+    \ifnum#1<0 \kklv@error@invalidlb{#1}\else
+    \ifnum#1>2 \kklv@error@invalidlb{#1}\else
+      \kklv@linebreak={#1}%
+    \fi\fi
+  }
 }
 \newcommand{\KKvLNChange}[1]{\pgfkeys{/kklvlinenumber/.cd, #1}}
-\KKvLNChange{font=\ttfamily, color=black!80, size=\small}
-% Upper limit of the line number is 6 digits.
+\KKvLNChange{font=\ttfamily, color=black!80, size=\small, start=1, style=0}
+
 \newcommand{\KKlvLineNumber}[1]{{%
+  % Upper limit of the line number is 6 digits.
+  % This is an internal macro.
   \kklvlinenumber@set@font%
   \color{\kklvlinenumber@set@color}%
   \kklvlinenumber@set@size%
@@ -71,7 +76,9 @@
 %%% replacer
 \def\kklv@lua@str#1{"\luatexluaescapestring{#1}"}
 \newcommand{\KKvSetMap}[2]{{%
-  \directlua{KKLuaVerb.add_replacement(\kklv@lua@str{#1}, \kklv@lua@str{#2})}%
+  \directlua{
+    KKLuaVerb.add_replacement(\kklv@lua@str{#1}, \kklv@lua@str{#2})
+  }%
 }}
 %%%
 
@@ -93,6 +100,7 @@
     \noexpand\KKlvStart*#1\noexpand\KKlvEnd*%
   \fi%
 }
+
 % Run KKLuaVerb.scanner on each line.
 \directlua{
   luatexbase.add_to_callback(
@@ -101,6 +109,5 @@
     "kkluaverb_scanner"
   )
 }
-\newcommand{\KKverb}{} 
 %%%
 \endinput
