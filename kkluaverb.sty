@@ -1,4 +1,10 @@
 % KKluaverb.sty
+% Copyright (c) 2026 Kosei Kawaguchi
+% Released under the MIT License (see LICENSE.md for details)
+% -----
+% This file is based on 'bxrawstr.lua' by Takayuki YATO (aka. "ZR").
+% Copyright (c) 2018 Takayuki YATO
+% -----
 
 % Commands for usr: KKv-
 % Commands for system: KKlv-
@@ -17,9 +23,14 @@
   /kklv/.is family, /kklv/.cd,
   font/.store in  = \kklv@set@font,
   color/.store in = \kklv@set@color,
+  enabled/.code = {%
+    \directlua{KKLuaVerb.enabled = #1}%
+  },
 }
 \newcommand{\KKvOpChange}[1]{\pgfkeys{/kklv/.cd, #1}}
-\KKvOpChange{font=\ttfamily, color=black}
+\KKvOpChange{font=\ttfamily, color=black, enabled=true}
+\newcommand{\KKvScanOn}{\KKvOpChange{enabled=true}}
+\newcommand{\KKvScanOff}{\KKvOpChange{enabled=false}}
 %%%
 
 %%% def delims

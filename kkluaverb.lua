@@ -1,13 +1,9 @@
 -- KKluaverb.lua
+-- Copyright (c) 2026 Kosei Kawaguchi
+-- Released under the MIT License (see LICENSE.md for details)
 --
--- Copyright (c) 2026 Kosei Kawaguchi 
---
--- This package utilizes logic from 'bxrawstr' (by Takayuki YATO).
--- package: https://gist.github.com/zr-tex8r/c7901658a866adfcd3cd66b6dfa86997
--- article: https://zrbabbler.hatenablog.com/entry/20181222/1545495849
--- Copyright (c) 2018 Takayuki YATO (aka. "ZR")
---
--- Released under the MIT License.
+-- This file is based on 'bxrawstr.lua' by Takayuki YATO (aka. "ZR").
+-- Copyright (c) 2018 Takayuki YATO
 --
 
 luatexbase.provides_module{
@@ -15,6 +11,9 @@ luatexbase.provides_module{
   date     = '2026/01/12',
   version  = '1.5.0',
 }
+
+KKLuaVerb = KKLuaVerb or {}
+KKLuaVerb.enabled = true 
 
 local KKV = {}
 local in_process = false
@@ -142,6 +141,9 @@ end
 
 -- scanner
 function KKV.scanner(line)
+  -- If the sccanner is unabled, it returns nil.
+  if not KKLuaVerb.enabled then return nil end
+
   -- When the process_input_buffer runs,
   -- a chunk of text on a single line
   -- is passed to the function as the argument `line`

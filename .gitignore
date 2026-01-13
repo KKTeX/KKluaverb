@@ -17,5 +17,6 @@ Icon
 *.ilg
 *.ind
 *.ltjruby
+*.listing
 *.synctex.*
 test.tex
