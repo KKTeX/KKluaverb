@@ -1,6 +1,6 @@
 \documentclass[luatex,fontsize=8pt,paper=b5,twoside]{jlreq}%
 \usepackage{amsmath,amssymb}
-\usepackage{booktabs,caption}
+\usepackage{booktabs,caption, tabularray}
 \usepackage{luwa-ul}
 \usepackage{KKsymbols}
 \usepackage[most]{tcolorbox}
@@ -133,7 +133,7 @@ fonttitle=\ascb@gtfamily, IfValueTF={#1}{title=\hspace*{.1em}【#2】〈#1〉\hs
 %%%
 
 \section{Outline}
-\KKverb|KKluaverb| is a LaTeX package which provides a Lua-enhanced \KKverb|\verb| command, \KKverb|\KKverb|. \thinHighLight{It can be used in the table of contents, index, underline commands (e.g., \KKverb|\underLineKK| provided by the luwa-ul package), \KKverb|tblr| environment and so on.}
+The \KKverb|KKluaverb| is a LaTeX package which provides a Lua-enhanced \KKverb|\verb| command, \KKverb|\KKverb|. \thinHighLight{It can be used in the table of contents, index, underline commands (e.g., \KKverb|\underLineKK| provided by the luwa-ul package), \KKverb|tblr| environment and so on.}
 
 \section{Acknowledgements / Credit}
 In devoloping this package, I made use of an algorithm which is used in ``bxrawstr'' (by Takayuki YATO)\footnote{%
@@ -155,11 +155,41 @@ As mentioned in the ``Outline'' seciton, this package mainly provides enhanced \
 
 \subsection{In Verbatim Environments}
 When this package is loaded, the Lua-sccaning which enables \KKverb|\KKverb| to detokenize its argument is activated.
-However, when the \KKverb|\KKverb| used in verbatim environments such as ``listings'' and ``tcblisting'', the argument cannot be decoded properly.
+However, when \KKverb|\KKverb| used in verbatim environments such as ``lstlistings'' and ``tcblisting'', the argument cannot be decoded properly.
 \namiKK{In such cases, you should use \KKverb|\KKvScanOff| which deactivates the sccaning process used internally in \KKverb|KKverb.lua|.} Of course, \KKverb|\KKvScanOn| re-activetes the process.
 
-% \subsection{Optional useage}
-% 書きかけ
+\subsection{Optional Useage}
+In addition to the main function of \KKverb|\KKverb|, some optional funcions are provided.
+
+\KKverb|\KKvOpChange| can change font and color of the output of \KKverb|\KKverb|. Also, it can activate or deactivate the sccaner.
+The usage is as follows:
+
+\KKvScanOff
+\begin{SourceCode}{Input}{TeX}
+  {\KKvOpChange{color=blue, font=\gtfamily, enabled=true}%
+  \KKverb|\def\TEST{Test Text.}|}
+\end{SourceCode}
+\KKvScanOn
+\begin{OutPut}{Output}
+  {\KKvOpChange{color=blue, font=\gtfamily, enabled=true}%
+  \KKverb|\def\TEST{Test Text.}|}
+\end{OutPut}
+
+\begin{center}
+  \captionof{table}{Default Values of \KKverb|\KKvOpChange|}
+  \begin{tblr}{
+    colspec = {l l l},
+    hline{1,Z} = {0.8pt}, 
+    hline{2} = {.4pt}, 
+    column{1} = {font=\ttfamily}, 
+    row{1} = {font=\bfseries, bg=gray9}, 
+  }
+    Key & Default Value & Description \\
+    font & \KKverb|\ttfamily| & Sets the font for the verbatim text. \\
+    color & \KKverb|color| & Sets the text color (requires xcolor). \\
+    enabled & \KKverb|true| & Activates or deactivates the scanning engine. \\
+  \end{tblr}
+\end{center}
 
 \end{document}
 
