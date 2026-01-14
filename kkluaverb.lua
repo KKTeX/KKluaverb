@@ -222,9 +222,20 @@ function KKV.scanner_for_verb(line)
       -- testA
       if s_short_idx and (not s_idx or s_short_idx < s_idx) then
         in_process = true
-        local transform = line:sub(pos, s_short_idx - 1) .. "{\\KKvLNChange{style=1}" .. CMD_INIT
+
+        local next_char = line:sub(e_short_idx + 1, e_short_idx + 1)
+        local style_num = "1" 
+        local skip_len = 0
+
+        if next_char == "+" then
+          style_num = "2"   
+          skip_len = 1     
+        end
+
+        local transform = line:sub(pos, s_short_idx - 1) .. "{\\KKvLNChange{style=" .. style_num .. "}" .. CMD_INIT
         table.insert(res, transform)
-        pos = e_short_idx + 1
+        
+        pos = e_short_idx + 1 + skip_len
       elseif s_idx then
         in_process = true 
         table.insert(res, line:sub(pos, s_idx - 1) .. CMD_INIT)
