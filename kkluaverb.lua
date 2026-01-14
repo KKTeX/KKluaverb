@@ -8,8 +8,8 @@
 
 luatexbase.provides_module{
   name     = 'KKluaverb',
-  date     = '2026/01/12',
-  version  = '1.5.0',
+  date     = '2026/01/15',
+  version  = '2.0.0',
 }
 
 ----- for .sty interface -----
@@ -111,8 +111,8 @@ function KKV.decode(rstr)
       last_idx = last_idx - 1
     end
     tex.sprint("\\par\\noindent")
-    for i = 2, last_idx do
-      tex.sprint("\\phantom{\\KKlvLineNumber{" .. (i - 1 + fl_linenumber) .. "}}")
+    for i = 1, last_idx do
+      tex.sprint("\\phantom{\\KKlvLineNumber{" .. (i + fl_linenumber) .. "}}")
       local content = dc_lines[i]
       if content ~= "" then
         local map_to_use = KKV.active_map or {}
@@ -142,8 +142,8 @@ function KKV.decode(rstr)
       last_idx = last_idx - 1
     end
     tex.sprint("\\par\\noindent")
-    for i = 2, last_idx do
-      tex.sprint("\\KKlvLineNumber{" .. (i - 1 + fl_linenumber) .. "}")
+    for i = 1, last_idx do
+      tex.sprint("\\KKlvLineNumber{" .. (i + fl_linenumber) .. "}")
       local content = dc_lines[i]
       if content ~= "" then
         local map_to_use = KKV.active_map or {}
@@ -202,22 +202,6 @@ function KKV.scanner_for_verb(line)
       local s_idx, e_idx = line:find(start_cmd, pos, true)
       -- for \KKcodeS, E
       local s_short_idx, e_short_idx = line:find(shortcut_start, pos, true)
-      
-      -- base
-      -- if s_idx then
-      --   in_process = true 
-      --   table.insert(res, line:sub(pos, s_idx - 1) .. CMD_INIT)
-      --   pos = e_idx + 1
-      --   if not line:find(trm, pos, true) then
-      --     local sc_content = line:sub(pos)
-      --     table.insert(res, KKV.encode_tail(sc_content) .. "%")
-      --     pos = #line + 1 
-      --   end
-      -- else
-      --   table.insert(res, line:sub(pos))
-      --   break
-      -- end
-      --
 
       -- testA
       if s_short_idx and (not s_idx or s_short_idx < s_idx) then
@@ -234,7 +218,7 @@ function KKV.scanner_for_verb(line)
 
         local transform = line:sub(pos, s_short_idx - 1) .. "{\\KKvLNChange{style=" .. style_num .. "}" .. CMD_INIT
         table.insert(res, transform)
-        
+
         pos = e_short_idx + 1 + skip_len
       elseif s_idx then
         in_process = true 
@@ -247,20 +231,6 @@ function KKV.scanner_for_verb(line)
       --
 
     else
-
-      -- base
-      -- local s_idx, e_idx = line:find(trm, pos, true)
-      -- if s_idx then
-      --   local sc_content = line:sub(pos, s_idx - 1)
-      --   table.insert(res, KKV.encode(sc_content) .. CMD_TERM)
-      --   in_process = false 
-      --   pos = e_idx + 1
-      -- else
-      --   local sc_content = line:sub(pos)
-      --   table.insert(res, KKV.encode_tail(sc_content) .. "%")
-      --   break
-      -- end
-      --
 
       -- testA
       local s_idx, e_idx = line:find(trm, pos, true)
