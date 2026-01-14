@@ -13,7 +13,7 @@ luatexbase.provides_module{
 }
 
 ----- for .sty interface -----
-KKLuaVerb = {}
+KKLuaVerb = KKLuaVerb or {}
 ----------
 
 
@@ -143,8 +143,17 @@ function KKV.decode(rstr)
   -- If lb_flag is not "1" or "2",
   -- any linebreaks are completely ignored.
   else
+    -- decoded = decoded:gsub('[\t\r\n]', '') 
+    -- tex.sprint(-2, decoded)
+
+    -- test
     decoded = decoded:gsub('[\t\r\n]', '') 
-    tex.sprint(-2, decoded)
+    
+    local my_targets = {"\\section", "\\def"} -- test targets
+    local my_color = "red"
+    
+    KKV.output_with_color(decoded, my_targets, my_color)
+    --
   end
 end
 ----------
@@ -206,6 +215,60 @@ function KKV.scanner_for_verb(line)
     end
   end
   return table.concat(res)
+end
+----------
+
+
+----- test -----
+function KKV.cut_multiple_tokens(line, targets)
+  local parts = {}
+  local pos = 1
+  
+  while pos <= #line do
+    local nearest_s = nil
+    local nearest_e = nil
+    local found_token = nil
+    
+    for _, token in ipairs(targets) do
+      local s, e = line:find(token, pos, true)
+      if s then
+        if not nearest_s or s < nearest_s then
+          nearest_s = s
+          nearest_e = e
+          found_token = token
+        end
+      end
+    end
+    
+    if nearest_s then
+      if nearest_s > pos then
+        table.insert(parts, { type = "plain", content = line:sub(pos, nearest_s - 1) })
+      end
+      table.insert(parts, { type = "token", content = found_token })
+      pos = nearest_e + 1
+    else
+      local rest = line:sub(pos)
+      if #rest > 0 then
+        table.insert(parts, { type = "plain", content = rest })
+      end
+      break
+    end
+  end
+  return parts
+end
+
+function KKV.output_with_color(line, targets, color)
+  local parts = KKV.cut_multiple_tokens(line, targets)
+  
+  for _, p in ipairs(parts) do
+    if p.type == "token" then
+      tex.sprint("\\textcolor{" .. color .. "}{")
+      tex.sprint(-2, p.content)
+      tex.sprint("}")
+    else
+      tex.sprint(-2, p.content)
+    end
+  end
 end
 ----------
 
