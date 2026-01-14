@@ -106,7 +106,7 @@ function KKV.decode(rstr)
       local content = dc_lines[i]
       if content ~= "" then
         local map_to_use = KKV.active_map or {}
-        KKV.output_with_multiple_colors(content, map_to_use)
+        KKV.output_with_multiple_colors(content, map_to_use, true)
       end
       if i < last_idx then
         tex.sprint("\\hfill\\break\\noindent")
@@ -137,7 +137,7 @@ function KKV.decode(rstr)
       local content = dc_lines[i]
       if content ~= "" then
         local map_to_use = KKV.active_map or {}
-        KKV.output_with_multiple_colors(content, map_to_use)
+        KKV.output_with_multiple_colors(content, map_to_use, true)
       end
       if i < last_idx then
         tex.sprint("\\hfill\\break\\noindent")
@@ -313,11 +313,18 @@ function KKV.output_with_color(line, targets, color)
   end
 end
 
-function KKV.output_with_multiple_colors(line, color_map)
+-- base
+-- function KKV.output_with_multiple_colors(line, color_map)
+--
+-- testC
+function KKV.output_with_multiple_colors(line, color_map, allow_comments)
+--
 
   -- testB
   local options = (type(color_map) == "table" and color_map.options) or {}
   local actual_map = color_map.map or color_map
+  local code_part = line     
+  local comment_part = ""     
   --
   
   local all_targets = {}
@@ -333,14 +340,55 @@ function KKV.output_with_multiple_colors(line, color_map)
   -- local parts = KKV.cut_multiple_tokens(line, all_targets)
   --
 
-  -- testB
+  -- testC
+  if allow_comments and options.comment_char then
+    local c_char = options.comment_char
+    local e_char = options.escape_char or "\\" 
+    
+    local search_pos = 1
+    while true do
+      local s = line:find(c_char, search_pos, true)
+      if not s then break end 
+      
+      local is_escaped = false
+      if s > 1 and line:sub(s-1, s-1) == e_char then
+        local count = 0
+        local p = s - 1
+        while p >= 1 and line:sub(p, p) == e_char do
+          count = count + 1
+          p = p - 1
+        end
+        if count % 2 == 1 then is_escaped = true end
+      end
+      
+      if not is_escaped then
+        code_part = line:sub(1, s-1)
+        comment_part = line:sub(s)
+        break
+      else
+        search_pos = s + 1
+      end
+    end
+  end
+
   for color, targets in pairs(actual_map) do
     for _, t in ipairs(targets) do
       table.insert(all_targets, t)
       token_to_color[t] = color
     end
   end
-  local parts = KKV.cut_multiple_tokens(line, all_targets, options)
+
+  local parts = KKV.cut_multiple_tokens(code_part, all_targets, options)
+  --
+
+  -- testB
+  -- for color, targets in pairs(actual_map) do
+  --   for _, t in ipairs(targets) do
+  --     table.insert(all_targets, t)
+  --     token_to_color[t] = color
+  --   end
+  -- end
+  -- local parts = KKV.cut_multiple_tokens(line, all_targets, options)
   --
   
   for _, p in ipairs(parts) do
@@ -353,6 +401,15 @@ function KKV.output_with_multiple_colors(line, color_map)
       tex.sprint(-2, p.content)
     end
   end
+
+  -- testC
+  if comment_part ~= "" then
+    local c_color = options.comment_color or "gray"
+    tex.sprint("\\textcolor{" .. c_color .. "}{")
+    tex.sprint(-2, comment_part)
+    tex.sprint("}")
+  end
+  --
 end
 ----------
 

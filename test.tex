@@ -2,17 +2,47 @@
 \usepackage{KKluaverb}
 
 \begin{luacode*}
-  KKLuaVerb.presets["my_orange_style"] = {
-    orange = { [[\def]], [[\begin]], [[\end]] },
-    green  = { [[\if]], [[\else]], [[\fi]] }
+  KKLuaVerb.presets["TeXStyle"] = {
+    map = { 
+      red = { [[\def]], [[\begin]], [[\end]], [[\long]] },
+      blue  = { [[\if]], [[\else]], [[\fi]] }
+    }, 
+    options = { 
+      word_boundary = true,
+      comment_char = "%",     -- コメント開始
+      comment_color = "green", -- コメントの色
+      escape_char = "\\"      -- エスケープ文字
+    }
+  }
+\end{luacode*}
+
+\begin{luacode*}
+  KKLuaVerb.presets["LuaStyle"] = {
+    map = { 
+      red = { [[if]], [[else]], [[then]], [[elseif]] , [[end]] },
+      blue  = { [[local]], [[function]] }
+    },
+    options = { word_boundary = true }
   }
 \end{luacode*}
 
 \begin{document}
 
-\KKvUsePreset{my_orange_style}
+\KKvUsePreset{TeXStyle}
 
-\KKverb|\defあ
-あ\ifああ\else|
+\KKverb|\def\test\ifあああ\elseいいい\fi|
+
+{\KKvLNChange{style=2}%
+\KKverb|
+
+\long\def\foo{%
+  ABC DEF EFG
+}
+
+|}
+
+\KKvUsePreset{LuaStyle}
+
+\KKverb|if A == B then else A_if B_else end|
 
 \end{document}
