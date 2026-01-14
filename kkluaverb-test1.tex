@@ -2,17 +2,34 @@
 \usepackage{KKluaverb}
 
 \begin{luacode*}
-  KKLuaVerb.presets["my_orange_style"] = {
-    orange = { [[\def]], [[\begin]], [[\end]] },
-    green  = { [[\if]], [[\else]], [[\fi]] }
+  KKLuaVerb.presets["TeXStyle"] = {
+    map = { 
+      orange = { [[\def]], [[\begin]], [[\end]] },
+      green  = { [[\if]], [[\else]], [[\fi]] }
+    }, 
+    options = { word_boundary = false }
+  }
+\end{luacode*}
+
+\begin{luacode*}
+  KKLuaVerb.presets["LuaStyle"] = {
+    map = { 
+      red = { [[if]], [[else]], [[then]], [[elseif]] },
+      blue  = { [[local]] }
+    },
+    options = { word_boundary = true }
   }
 \end{luacode*}
 
 \begin{document}
 
-\KKvUsePreset{my_orange_style}
+\KKvUsePreset{TeXStyle}
 
 \KKverb|\defあ
 あ\ifああ\else|
+
+\KKvUsePreset{LuaStyle}
+
+\KKverb|if A == B else Aelse Bif elseif|
 
 \end{document}

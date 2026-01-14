@@ -219,7 +219,18 @@ end
 
 
 ----- color changer -----
-function KKV.cut_multiple_tokens(line, targets)
+local function is_alnum(char)
+  if not char then return false end
+  return char:match("[A-Za-z0-9_]") ~= nil
+end
+
+--base
+-- function KKV.cut_multiple_tokens(line, targets)
+--
+--testB
+function KKV.cut_multiple_tokens(line, targets, options)
+  local use_boundary = options and options.word_boundary
+--
   local parts = {}
   local pos = 1
   
@@ -228,16 +239,42 @@ function KKV.cut_multiple_tokens(line, targets)
     local nearest_e = nil
     local found_token = nil
     
+    -- base
+    -- for _, token in ipairs(targets) do
+    --   local s, e = line:find(token, pos, true)
+    --   if s then
+    --     if not nearest_s or s < nearest_s then
+    --       nearest_s = s
+    --       nearest_e = e
+    --       found_token = token
+    --     end
+    --   end
+    -- end
+    --
+
+    -- testB 
     for _, token in ipairs(targets) do
       local s, e = line:find(token, pos, true)
       if s then
-        if not nearest_s or s < nearest_s then
+        local is_valid = true 
+        
+        if use_boundary then
+          local prev_char = s > 1 and line:sub(s-1, s-1) or nil
+          local next_char = e < #line and line:sub(e+1, e+1) or nil
+          
+          if is_alnum(prev_char) or is_alnum(next_char) then
+            is_valid = false
+          end
+        end
+
+        if is_valid and (not nearest_s or s < nearest_s) then
           nearest_s = s
           nearest_e = e
           found_token = token
         end
       end
     end
+    --
     
     if nearest_s then
       if nearest_s > pos then
@@ -272,17 +309,34 @@ end
 
 function KKV.output_with_multiple_colors(line, color_map)
   -- color_map: { ["red"] = {"\\section", "\\def"}, ["blue"] = {"\\if", "\\else", "\\fi"} } 
+
+  --testB
+  local options = (type(color_map) == "table" and color_map.options) or {}
+  local actual_map = color_map.map or color_map
+  --
   
   local all_targets = {}
   local token_to_color = {} 
-  for color, targets in pairs(color_map) do
+
+  -- base
+  -- for color, targets in pairs(color_map) do
+  --   for _, t in ipairs(targets) do
+  --     table.insert(all_targets, t)
+  --     token_to_color[t] = color
+  --   end
+  -- end
+  -- local parts = KKV.cut_multiple_tokens(line, all_targets)
+  --
+
+  --testB
+  for color, targets in pairs(actual_map) do
     for _, t in ipairs(targets) do
       table.insert(all_targets, t)
       token_to_color[t] = color
     end
   end
-
-  local parts = KKV.cut_multiple_tokens(line, all_targets)
+  local parts = KKV.cut_multiple_tokens(line, all_targets, options)
+  --
   
   for _, p in ipairs(parts) do
     if p.type == "token" then
