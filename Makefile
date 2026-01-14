@@ -14,7 +14,6 @@ builddoc:
 	$(MAKE) clean
 
 buildtest:
-	latexmk -C
 	latexmk -r $(RC) $(TEST_TARGET).tex
 	$(MAKE) clean
 

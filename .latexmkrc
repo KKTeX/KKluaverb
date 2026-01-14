@@ -5,4 +5,4 @@ $postscript_mode = $dvi_mode = 0;
 $makeindex = 'upmendex %O -o %D %S';
 
 # auxiliary files
-$clean_ext = 'synctex.gz synctex.gz(busy) run.xml loe';
+$clean_ext .= ' %R.listing %R.synctex.gz %R.synctex.gz(busy) %R.run.xml %R.loe';
