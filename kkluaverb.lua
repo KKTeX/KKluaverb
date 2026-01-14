@@ -12,9 +12,12 @@ luatexbase.provides_module{
   version  = '1.5.0',
 }
 
-KKLuaVerb = KKLuaVerb or {}
-KKLuaVerb.enabled = true 
+----- for .sty interface -----
+KKLuaVerb = {}
+----------
 
+
+----- for .lua interface-----
 local KKV = {}
 local in_process = false
 
@@ -22,8 +25,10 @@ local CMD_INIT = "\\KKlvStart*"
 local CMD_TERM = "\\KKlvEnd*"
 local DEFAULT_STARTER = "\\KKverb"
 local ltjflg = utf8.char(0xFFFFF) .. "\n$"
+----------
 
--- encode
+
+----- encode -----
 function KKV.encode(str)
   if not str then return "" end
   local t = {}
@@ -53,14 +58,18 @@ function KKV.encode_tail(str)
   local s = (str .. "\n"):gsub(ltjflg, "\n")
   return KKV.encode(s)
 end
+----------
 
--- replacement
+
+----- replacement -----
 KKV.replacements = {}
 function KKV.add_replacement(from_char, to_char)
   KKV.replacements[from_char] = to_char
 end
+----------
 
--- decode
+
+----- decode -----
 function KKV.decode(rstr)
   local chex = function(s) return utf8.char(tonumber(s, 16)) end
   local decoded = rstr
@@ -138,9 +147,11 @@ function KKV.decode(rstr)
     tex.sprint(-2, decoded)
   end
 end
+----------
 
--- scanner
-function KKV.scanner(line)
+
+----- scanner -----
+function KKV.scanner_for_verb(line)
   -- If the sccanner is unabled, it returns nil.
   if not KKLuaVerb.enabled then return nil end
 
@@ -183,7 +194,8 @@ function KKV.scanner(line)
     else
       local s_idx, e_idx = line:find(trm, pos, true)
       if s_idx then
-        table.insert(res, KKV.encode(line:sub(pos, s_idx - 1)) .. CMD_TERM)
+        local sc_content = line:sub(pos, s_idx - 1)
+        table.insert(res, KKV.encode(sc_content) .. CMD_TERM)
         in_process = false 
         pos = e_idx + 1
       else
@@ -195,5 +207,6 @@ function KKV.scanner(line)
   end
   return table.concat(res)
 end
+----------
 
 _G.KKLuaVerb = KKV
