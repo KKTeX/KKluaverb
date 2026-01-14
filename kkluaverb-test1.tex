@@ -4,8 +4,8 @@
 \begin{luacode*}
   KKLuaVerb.presets["TeXStyle"] = {
     map = { 
-      orange = { [[\def]], [[\begin]], [[\end]] },
-      green  = { [[\if]], [[\else]], [[\fi]] }
+      red = { [[\def]], [[\begin]], [[\end]], [[\long]] },
+      blue  = { [[\if]], [[\else]], [[\fi]] }
     }, 
     options = { word_boundary = false }
   }
@@ -14,8 +14,8 @@
 \begin{luacode*}
   KKLuaVerb.presets["LuaStyle"] = {
     map = { 
-      red = { [[if]], [[else]], [[then]], [[elseif]] },
-      blue  = { [[local]] }
+      red = { [[if]], [[else]], [[then]], [[elseif]] , [[end]] },
+      blue  = { [[local]], [[function]] }
     },
     options = { word_boundary = true }
   }
@@ -25,11 +25,19 @@
 
 \KKvUsePreset{TeXStyle}
 
-\KKverb|\defあ
-あ\ifああ\else|
+\KKverb|\def\test\ifあああ\elseいいい\fi|
+
+{\KKvLNChange{style=2}%
+\KKverb|
+
+\long\def\foo{%
+  ABC DEF EFG
+}
+
+|}
 
 \KKvUsePreset{LuaStyle}
 
-\KKverb|if A == B else Aelse Bif elseif|
+\KKverb|if A == B then else A_if B_else end|
 
 \end{document}

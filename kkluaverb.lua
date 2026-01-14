@@ -90,6 +90,9 @@ function KKV.decode(rstr)
   -- Behave like an environment.
   if lb_flag == "1" then
     local dc_lines = {}
+    local fl_linenumber = (tex.count["kklv@linenum@start"] - 1)
+
+    -- Separate 'decoded' to 'dc_lines'.
     for line in (decoded .. "\n"):gmatch("(.-)\n") do
       table.insert(dc_lines, line)
     end
@@ -99,9 +102,11 @@ function KKV.decode(rstr)
     end
     tex.sprint("\\par\\noindent")
     for i = 2, last_idx do
+      tex.sprint("\\phantom{\\KKlvLineNumber{" .. (i - 1 + fl_linenumber) .. "}}")
       local content = dc_lines[i]
       if content ~= "" then
-        tex.sprint(-2, content)
+        local map_to_use = KKV.active_map or {}
+        KKV.output_with_multiple_colors(content, map_to_use)
       end
       if i < last_idx then
         tex.sprint("\\hfill\\break\\noindent")
@@ -131,7 +136,8 @@ function KKV.decode(rstr)
       tex.sprint("\\KKlvLineNumber{" .. (i - 1 + fl_linenumber) .. "}")
       local content = dc_lines[i]
       if content ~= "" then
-        tex.sprint(-2, content)
+        local map_to_use = KKV.active_map or {}
+        KKV.output_with_multiple_colors(content, map_to_use)
       end
       if i < last_idx then
         tex.sprint("\\hfill\\break\\noindent")
@@ -308,9 +314,8 @@ function KKV.output_with_color(line, targets, color)
 end
 
 function KKV.output_with_multiple_colors(line, color_map)
-  -- color_map: { ["red"] = {"\\section", "\\def"}, ["blue"] = {"\\if", "\\else", "\\fi"} } 
 
-  --testB
+  -- testB
   local options = (type(color_map) == "table" and color_map.options) or {}
   local actual_map = color_map.map or color_map
   --
@@ -328,7 +333,7 @@ function KKV.output_with_multiple_colors(line, color_map)
   -- local parts = KKV.cut_multiple_tokens(line, all_targets)
   --
 
-  --testB
+  -- testB
   for color, targets in pairs(actual_map) do
     for _, t in ipairs(targets) do
       table.insert(all_targets, t)
