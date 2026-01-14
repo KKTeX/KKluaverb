@@ -143,16 +143,15 @@ function KKV.decode(rstr)
   -- If lb_flag is not "1" or "2",
   -- any linebreaks are completely ignored.
   else
+    -- base
     -- decoded = decoded:gsub('[\t\r\n]', '') 
     -- tex.sprint(-2, decoded)
+    --
 
-    -- test
+    -- testB
     decoded = decoded:gsub('[\t\r\n]', '') 
-    
-    local my_targets = {"\\section", "\\def"} -- test targets
-    local my_color = "red"
-    
-    KKV.output_with_color(decoded, my_targets, my_color)
+    local map_to_use = KKV.active_map or {}
+    KKV.output_with_multiple_colors(decoded, map_to_use)
     --
   end
 end
@@ -263,6 +262,32 @@ function KKV.output_with_color(line, targets, color)
   for _, p in ipairs(parts) do
     if p.type == "token" then
       tex.sprint("\\textcolor{" .. color .. "}{")
+      tex.sprint(-2, p.content)
+      tex.sprint("}")
+    else
+      tex.sprint(-2, p.content)
+    end
+  end
+end
+
+function KKV.output_with_multiple_colors(line, color_map)
+  -- color_map: { ["red"] = {"\\section", "\\def"}, ["blue"] = {"\\if", "\\else", "\\fi"} } 
+  
+  local all_targets = {}
+  local token_to_color = {} 
+  for color, targets in pairs(color_map) do
+    for _, t in ipairs(targets) do
+      table.insert(all_targets, t)
+      token_to_color[t] = color
+    end
+  end
+
+  local parts = KKV.cut_multiple_tokens(line, all_targets)
+  
+  for _, p in ipairs(parts) do
+    if p.type == "token" then
+      local c = token_to_color[p.content] or "black" 
+      tex.sprint("\\textcolor{" .. c .. "}{")
       tex.sprint(-2, p.content)
       tex.sprint("}")
     else

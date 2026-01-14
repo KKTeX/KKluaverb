@@ -1,6 +1,14 @@
 \documentclass{ltjsarticle}
 \usepackage{KKluaverb}
+
+\begin{luacode*}
+  KKLuaVerb.active_map = {
+    orange = { [[\def]], [[\begin]], [[\end]] },
+    green  = { [[\if]], [[\else]], [[\fi]] }
+  }
+\end{luacode*}
+
 \begin{document}
-\KKverb|\defああああ|
-\verb|\defああああ|
+\KKverb|\defああ\ifあ
+あ\else|
 \end{document}
