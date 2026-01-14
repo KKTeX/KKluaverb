@@ -24,6 +24,9 @@ local in_process = false
 local CMD_INIT = "\\KKlvStart*"
 local CMD_TERM = "\\KKlvEnd*"
 local DEFAULT_STARTER = "\\KKverb"
+local DEFAULT_STARTER_flag1 = "\\KKcodeS"
+local DEFAULT_TERMINATOR_flag1   = "\\KKcodeE"
+
 local ltjflg = utf8.char(0xFFFFF) .. "\n$"
 ----------
 
@@ -31,7 +34,9 @@ local ltjflg = utf8.char(0xFFFFF) .. "\n$"
 ----- encode -----
 function KKV.encode(str)
   if not str then return "" end
+
   local t = {}
+
   for _, code in utf8.codes(str) do     -- discard pos
     if ((code >= 48 and code <= 57)     -- 0-9
       or (code >= 65 and code <= 90)    -- A-Z
@@ -51,6 +56,7 @@ function KKV.encode(str)
       table.insert(t, formatted)
     end
   end
+
   return table.concat(t)
 end
 
@@ -63,12 +69,13 @@ end
 
 ----- replacement -----
 KKV.replacements = {}
+
 function KKV.add_replacement(from_char, to_char)
   KKV.replacements[from_char] = to_char
 end
 
--- Avoid ignoring space.
 KKV.add_replacement(" ", "\194\160")
+  -- Avoid ignoring space.
 ----------
 
 
@@ -152,16 +159,9 @@ function KKV.decode(rstr)
   -- If lb_flag is not "1" or "2",
   -- any linebreaks are completely ignored.
   else
-    -- base
-    -- decoded = decoded:gsub('[\t\r\n]', '') 
-    -- tex.sprint(-2, decoded)
-    --
-
-    -- testB
     decoded = decoded:gsub('[\t\r\n]', '') 
     local map_to_use = KKV.active_map or {}
     KKV.output_with_multiple_colors(decoded, map_to_use)
-    --
   end
 end
 ----------
@@ -188,38 +188,91 @@ function KKV.scanner_for_verb(line)
   local pos = 1 -- the character index
   local res = {} -- a transformed chunk
   local start_cmd = DEFAULT_STARTER .. ini
+  -- testA
+  local shortcut_start = DEFAULT_STARTER_flag1
+  local shortcut_end = DEFAULT_TERMINATOR_flag1
+  --
 
   -- While the character index 
   -- <= the length of the line,
   -- scan the chunk:
   while (pos <= #line) or (in_process and pos == 1 and #line == 0) do
     if not in_process then
+      -- for \KKverb
       local s_idx, e_idx = line:find(start_cmd, pos, true)
-      if s_idx then
+      -- for \KKcodeS, E
+      local s_short_idx, e_short_idx = line:find(shortcut_start, pos, true)
+      
+      -- base
+      -- if s_idx then
+      --   in_process = true 
+      --   table.insert(res, line:sub(pos, s_idx - 1) .. CMD_INIT)
+      --   pos = e_idx + 1
+      --   if not line:find(trm, pos, true) then
+      --     local sc_content = line:sub(pos)
+      --     table.insert(res, KKV.encode_tail(sc_content) .. "%")
+      --     pos = #line + 1 
+      --   end
+      -- else
+      --   table.insert(res, line:sub(pos))
+      --   break
+      -- end
+      --
+
+      -- testA
+      if s_short_idx and (not s_idx or s_short_idx < s_idx) then
+        in_process = true
+        local transform = line:sub(pos, s_short_idx - 1) .. "{\\KKvLNChange{style=1}" .. CMD_INIT
+        table.insert(res, transform)
+        pos = e_short_idx + 1
+      elseif s_idx then
         in_process = true 
         table.insert(res, line:sub(pos, s_idx - 1) .. CMD_INIT)
         pos = e_idx + 1
-        if not line:find(trm, pos, true) then
-          local sc_content = line:sub(pos)
-          table.insert(res, KKV.encode_tail(sc_content) .. "%")
-          pos = #line + 1 
-        end
       else
         table.insert(res, line:sub(pos))
         break
       end
+      --
+
     else
+
+      -- base
+      -- local s_idx, e_idx = line:find(trm, pos, true)
+      -- if s_idx then
+      --   local sc_content = line:sub(pos, s_idx - 1)
+      --   table.insert(res, KKV.encode(sc_content) .. CMD_TERM)
+      --   in_process = false 
+      --   pos = e_idx + 1
+      -- else
+      --   local sc_content = line:sub(pos)
+      --   table.insert(res, KKV.encode_tail(sc_content) .. "%")
+      --   break
+      -- end
+      --
+
+      -- testA
       local s_idx, e_idx = line:find(trm, pos, true)
-      if s_idx then
+      local s_short_end_idx, e_short_end_idx = line:find(shortcut_end, pos, true)
+
+      if s_short_end_idx and (not s_idx or s_short_end_idx < s_idx) then
+        local sc_content = line:sub(pos, s_short_end_idx - 1)
+        table.insert(res, KKV.encode(sc_content) .. CMD_TERM .. "}")
+        in_process = false 
+        pos = e_short_end_idx + 1
+      
+      elseif s_idx then
         local sc_content = line:sub(pos, s_idx - 1)
         table.insert(res, KKV.encode(sc_content) .. CMD_TERM)
         in_process = false 
         pos = e_idx + 1
+      
       else
         local sc_content = line:sub(pos)
         table.insert(res, KKV.encode_tail(sc_content) .. "%")
         break
       end
+      --
     end
   end
   return table.concat(res)
@@ -233,13 +286,8 @@ local function is_alnum(char)
   return char:match("[A-Za-z0-9_]") ~= nil
 end
 
---base
--- function KKV.cut_multiple_tokens(line, targets)
---
---testB
 function KKV.cut_multiple_tokens(line, targets, options)
   local use_boundary = options and options.word_boundary
---
   local parts = {}
   local pos = 1
   
@@ -248,20 +296,6 @@ function KKV.cut_multiple_tokens(line, targets, options)
     local nearest_e = nil
     local found_token = nil
     
-    -- base
-    -- for _, token in ipairs(targets) do
-    --   local s, e = line:find(token, pos, true)
-    --   if s then
-    --     if not nearest_s or s < nearest_s then
-    --       nearest_s = s
-    --       nearest_e = e
-    --       found_token = token
-    --     end
-    --   end
-    -- end
-    --
-
-    -- testB 
     for _, token in ipairs(targets) do
       local s, e = line:find(token, pos, true)
       if s then
@@ -283,7 +317,6 @@ function KKV.cut_multiple_tokens(line, targets, options)
         end
       end
     end
-    --
     
     if nearest_s then
       if nearest_s > pos then
@@ -316,34 +349,16 @@ function KKV.output_with_color(line, targets, color)
   end
 end
 
--- base
--- function KKV.output_with_multiple_colors(line, color_map)
---
--- testC
 function KKV.output_with_multiple_colors(line, color_map, allow_comments)
---
 
-  -- testB
   local options = (type(color_map) == "table" and color_map.options) or {}
   local actual_map = color_map.map or color_map
   local code_part = line     
   local comment_part = ""     
-  --
   
   local all_targets = {}
   local token_to_color = {} 
 
-  -- base
-  -- for color, targets in pairs(color_map) do
-  --   for _, t in ipairs(targets) do
-  --     table.insert(all_targets, t)
-  --     token_to_color[t] = color
-  --   end
-  -- end
-  -- local parts = KKV.cut_multiple_tokens(line, all_targets)
-  --
-
-  -- testC
   if allow_comments and options.comment_char then
     local c_char = options.comment_char
     local e_char = options.escape_char or "\\" 
@@ -382,19 +397,7 @@ function KKV.output_with_multiple_colors(line, color_map, allow_comments)
   end
 
   local parts = KKV.cut_multiple_tokens(code_part, all_targets, options)
-  --
 
-  -- testB
-  -- for color, targets in pairs(actual_map) do
-  --   for _, t in ipairs(targets) do
-  --     table.insert(all_targets, t)
-  --     token_to_color[t] = color
-  --   end
-  -- end
-  -- local parts = KKV.cut_multiple_tokens(line, all_targets, options)
-  --
-  
-  -- base
   for _, p in ipairs(parts) do
     if p.type == "token" then
       local c = token_to_color[p.content] or "black" 
@@ -405,16 +408,13 @@ function KKV.output_with_multiple_colors(line, color_map, allow_comments)
       tex.sprint(-2, p.content)
     end
   end
-  --
 
-  -- testC
   if comment_part ~= "" then
     local c_color = options.comment_color or "gray"
     tex.sprint("\\textcolor{" .. c_color .. "}{")
     tex.sprint(-2, comment_part)
     tex.sprint("}")
   end
-  --
 end
 ----------
 
