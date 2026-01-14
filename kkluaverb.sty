@@ -93,6 +93,12 @@
 }}
 %%%
 
+%%% color change
+\newcommand{\KKvUsePreset}[1]{%
+  \directlua{KKLuaVerb.load_preset("#1")}%
+}
+%%%
+
 %%% main
 % When the scanned chunk includes
 % a \KKlvStart*<text>\KKlvEnd* part,

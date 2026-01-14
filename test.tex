@@ -2,13 +2,17 @@
 \usepackage{KKluaverb}
 
 \begin{luacode*}
-  KKLuaVerb.active_map = {
+  KKLuaVerb.presets["my_orange_style"] = {
     orange = { [[\def]], [[\begin]], [[\end]] },
     green  = { [[\if]], [[\else]], [[\fi]] }
   }
 \end{luacode*}
 
 \begin{document}
-\KKverb|\defああ\ifあ
-あ\else|
+
+\KKvUsePreset{my_orange_style}
+
+\KKverb|\defあ
+あ\ifああ\else|
+
 \end{document}

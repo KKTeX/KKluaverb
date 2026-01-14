@@ -1,6 +1,18 @@
 \documentclass{ltjsarticle}
 \usepackage{KKluaverb}
 
+\begin{luacode*}
+  KKLuaVerb.presets["my_orange_style"] = {
+    orange = { [[\def]], [[\begin]], [[\end]] },
+    green  = { [[\if]], [[\else]], [[\fi]] }
+  }
+\end{luacode*}
+
 \begin{document}
+
+\KKvUsePreset{my_orange_style}
+
+\KKverb|\defあ
+あ\ifああ\else|
 
 \end{document}

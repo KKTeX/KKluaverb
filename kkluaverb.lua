@@ -218,7 +218,7 @@ end
 ----------
 
 
------ test -----
+----- color changer -----
 function KKV.cut_multiple_tokens(line, targets)
   local parts = {}
   local pos = 1
@@ -293,6 +293,24 @@ function KKV.output_with_multiple_colors(line, color_map)
     else
       tex.sprint(-2, p.content)
     end
+  end
+end
+----------
+
+
+----- preset -----
+KKV.presets = KKV.presets or {}
+
+function KKV.set_preset(name, map)
+    KKV.presets[name] = map
+end
+
+function KKV.load_preset(name)
+  if KKV.presets[name] then
+    KKV.active_map = KKV.presets[name]
+    print("KKV: Preset [" .. name .. "] applied.")
+  else
+    print("KKV: Warning - Preset [" .. name .. "] not found.")
   end
 end
 ----------
