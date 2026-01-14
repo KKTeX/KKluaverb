@@ -66,6 +66,9 @@ KKV.replacements = {}
 function KKV.add_replacement(from_char, to_char)
   KKV.replacements[from_char] = to_char
 end
+
+-- Avoid ignoring space.
+KKV.add_replacement(" ", "\194\160")
 ----------
 
 
@@ -391,6 +394,7 @@ function KKV.output_with_multiple_colors(line, color_map, allow_comments)
   -- local parts = KKV.cut_multiple_tokens(line, all_targets, options)
   --
   
+  -- base
   for _, p in ipairs(parts) do
     if p.type == "token" then
       local c = token_to_color[p.content] or "black" 
@@ -401,6 +405,7 @@ function KKV.output_with_multiple_colors(line, color_map, allow_comments)
       tex.sprint(-2, p.content)
     end
   end
+  --
 
   -- testC
   if comment_part ~= "" then

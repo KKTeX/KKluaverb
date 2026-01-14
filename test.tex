@@ -8,7 +8,7 @@
       blue  = { [[\if]], [[\else]], [[\fi]] }
     }, 
     options = { 
-      word_boundary = true,
+      word_boundary = false,
       comment_char = "%",     -- コメント開始
       comment_color = "green", -- コメントの色
       escape_char = "\\"      -- エスケープ文字
@@ -26,6 +26,8 @@
   }
 \end{luacode*}
 
+% \KKvSetMap{ }{_}
+
 \begin{document}
 
 \KKvUsePreset{TeXStyle}
@@ -35,9 +37,9 @@
 {\KKvLNChange{style=2}%
 \KKverb|
 
-\long\def\foo{%
+    \long\def\foo{% Comment
   ABC DEF EFG
-}
+    }
 
 |}
 

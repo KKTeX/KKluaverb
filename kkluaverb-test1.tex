@@ -7,7 +7,12 @@
       red = { [[\def]], [[\begin]], [[\end]], [[\long]] },
       blue  = { [[\if]], [[\else]], [[\fi]] }
     }, 
-    options = { word_boundary = false }
+    options = { 
+      word_boundary = true,
+      comment_char = "%",     -- コメント開始
+      comment_color = "green", -- コメントの色
+      escape_char = "\\"      -- エスケープ文字
+    }
   }
 \end{luacode*}
 
