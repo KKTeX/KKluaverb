@@ -76,12 +76,12 @@
 項 & テスト内容 \\
 1 & \KKverb|Standard Verb| \\
 2 & \underLineKK{\KKverb|Underlined Verb in Table|} \\
-3 & {\KKvLNChange{style=2}%
-\KKverb|
+3 & 
+\KKcodeS+
 Line 1
 Line 2 with space
 Line 3
-|} \\
+\KKcodeE \\
 4 & \KKverb|Special Chars: { } [ ] < > ( )| \\
 \end{tblr}
 \end{table}
@@ -99,8 +99,8 @@ Line 3
 ああああああああああああああああああああ
 ああああああああああああああああああああ
 ああああああああああああああああああああ%
-{\KKvLNChange{start=15, style=2}%
-\KKverb|
+{\KKvLNChange{start=15}%
+\KKcodeS+
 function hello() { 
   print("こんにちは、世界。"); -- space check
   return A + 1; !
@@ -113,7 +113,7 @@ This is a long sentence that should potentially wrap or be handled by the line b
 ここにグルーが入ってズレてほしくない。
 abcみたいな英字でも、
 123みたいな数字でも。
-|}
+\KKcodeE}
 ああああああああああああああああああああ
 ああああああああああああああああああああ
 ああああああああああああああああああああ
@@ -125,8 +125,8 @@ abcみたいな英字でも、
 ああああああああああああああああああああ
 ああああああああああああああああああああ
 ああああああああああああああああああああ%
-{\KKvLNChange{style=1}%
-\KKverb|
+
+\KKcodeS
 
 function hello() {
   print("こんにちは、世界。"); -- space check
@@ -141,7 +141,7 @@ This is a long sentence that should potentially wrap or be handled by the line b
 abcみたいな英字でも、
 123みたいな数字でも。
 
-|}
+\KKcodeE
 ああああああああああああああああああああ
 ああああああああああああああああああああ
 ああああああああああああああああああああ
