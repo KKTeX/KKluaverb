@@ -111,8 +111,7 @@ function KKV.decode(rstr)
       last_idx = last_idx - 1
     end
     tex.sprint("\\par\\noindent")
-    for i = 2, last_idx do
-      -- tex.sprint("\\phantom{\\KKlvLineNumber{" .. (i - 1 + fl_linenumber) .. "}}")
+    for i = 2, last_idx do -- ref: NOTE#1
       local content = dc_lines[i]
       if content ~= "" then
         local map_to_use = KKV.active_map or {}
@@ -142,7 +141,7 @@ function KKV.decode(rstr)
       last_idx = last_idx - 1
     end
     tex.sprint("\\par\\noindent")
-    for i = 2, last_idx do
+    for i = 2, last_idx do -- ref: NOTE#1
       tex.sprint("\\KKlvLineNumber{" .. (i - 1 + fl_linenumber) .. "}")
       local content = dc_lines[i]
       if content ~= "" then
@@ -253,8 +252,6 @@ function KKV.scanner_for_verb(line)
       --
 
     else
-
-      -- testA
       local s_idx, e_idx = line:find(trm, pos, true)
       local s_short_end_idx, e_short_end_idx = line:find(shortcut_end, pos, true)
 
@@ -275,7 +272,6 @@ function KKV.scanner_for_verb(line)
         table.insert(res, KKV.encode_tail(sc_content) .. "%")
         break
       end
-      --
     end
   end
   return table.concat(res)
@@ -338,22 +334,7 @@ function KKV.cut_multiple_tokens(line, targets, options)
   return parts
 end
 
-function KKV.output_with_color(line, targets, color)
-  local parts = KKV.cut_multiple_tokens(line, targets)
-  
-  for _, p in ipairs(parts) do
-    if p.type == "token" then
-      tex.sprint("\\textcolor{" .. color .. "}{")
-      tex.sprint(-2, p.content)
-      tex.sprint("}")
-    else
-      tex.sprint(-2, p.content)
-    end
-  end
-end
-
 function KKV.output_with_multiple_colors(line, color_map, allow_comments)
-
   local options = (type(color_map) == "table" and color_map.options) or {}
   local actual_map = color_map.map or color_map
   local code_part = line     
