@@ -38,16 +38,16 @@
 \KKverb|\def\test\ifああ
 あ\elseいいい\fi|
 
-\KKcodeS+
-  % test comment
-  \long\def\foo{%
-    ABC DEF EFG
-  }
+\KKcodeS
+      % test comment
+      \long\def\foo{%
+        ABC DEF EFG
+      }
 \KKcodeE
 
 \KKvUsePreset{LuaStyle}
 
-\KKcodeS+
+\KKcodeS
   -- test comment
   function KKV.encode_tail(str)
     local s = (str .. "\n"):gsub(ltjflg, "\n")

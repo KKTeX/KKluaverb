@@ -112,7 +112,7 @@ function KKV.decode(rstr)
     end
     tex.sprint("\\par\\noindent")
     for i = 2, last_idx do
-      tex.sprint("\\phantom{\\KKlvLineNumber{" .. (i - 1 + fl_linenumber) .. "}}")
+      -- tex.sprint("\\phantom{\\KKlvLineNumber{" .. (i - 1 + fl_linenumber) .. "}}")
       local content = dc_lines[i]
       if content ~= "" then
         local map_to_use = KKV.active_map or {}
