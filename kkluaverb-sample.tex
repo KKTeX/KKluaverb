@@ -30,9 +30,40 @@
 \KKvSetMap{A}{[A-mapped]}
 \KKvSetMap{!}{〈EXCLAMATION〉}
 
+\begin{luacode*}
+  KKLuaVerb.presets["TeXStyle"] = {
+    map = { 
+      brown = { [[\def]], [[\begin]], [[\end]], [[\long]] },
+      Magenta  = { [[\if]], [[\else]], [[\fi]] },
+    }, 
+    options = { 
+      word_boundary = false,
+      comment_char = "%",     
+      comment_color = "ForestGreen", 
+      escape_char = "\\"      
+    }
+  }
+\end{luacode*}
+
+\begin{luacode*}
+  KKLuaVerb.presets["LuaStyle"] = {
+    map = { 
+      Magenta = { [[if]], [[else]], [[then]], [[elseif]] , [[end]] , [[for]] , [[function]], [[return]]},
+      ProcessBlue  = { [[local]] , [[true]], [[false]]}
+    },
+    options = { 
+      word_boundary = true,
+      comment_char = "--",     
+      comment_color = "Cerulean", 
+      escape_char = "%"      
+    }
+  }
+\end{luacode*}
+
 \makeindex
 
 \begin{document}
+\KKvUsePreset{LuaStyle}
 
 \tableofcontents
 \listoftables

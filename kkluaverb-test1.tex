@@ -4,14 +4,14 @@
 \begin{luacode*}
   KKLuaVerb.presets["TeXStyle"] = {
     map = { 
-      red = { [[\def]], [[\begin]], [[\end]], [[\long]] },
-      blue  = { [[\if]], [[\else]], [[\fi]] }
+      brown = { [[\def]], [[\begin]], [[\end]], [[\long]] },
+      Magenta  = { [[\if]], [[\else]], [[\fi]] },
     }, 
     options = { 
-      word_boundary = true,
-      comment_char = "%",     -- コメント開始
-      comment_color = "green", -- コメントの色
-      escape_char = "\\"      -- エスケープ文字
+      word_boundary = false,
+      comment_char = "%",     
+      comment_color = "ForestGreen", 
+      escape_char = "\\"      
     }
   }
 \end{luacode*}
@@ -19,13 +19,18 @@
 \begin{luacode*}
   KKLuaVerb.presets["LuaStyle"] = {
     map = { 
-      red = { [[if]], [[else]], [[then]], [[elseif]] , [[end]] },
-      blue  = { [[local]], [[function]] }
+      Magenta = { [[if]], [[else]], [[then]], [[elseif]] , [[end]] , [[for]] , [[function]], [[return]]},
+      ProcessBlue  = { [[local]] , [[true]], [[false]]}
     },
-    options = { word_boundary = true }
+    options = { 
+      word_boundary = true,
+      comment_char = "--",     
+      comment_color = "Cerulean", 
+      escape_char = "%"      
+    }
   }
 \end{luacode*}
-\KKvSetMap{ }{␣}
+
 \begin{document}
 
 \KKvUsePreset{TeXStyle}
@@ -34,23 +39,20 @@
 あ\elseいいい\fi|
 
 \KKcodeS+
-\long\def\foo{%
-  ABC DEF EFG
-}
-
+  % test comment
+  \long\def\foo{%
+    ABC DEF EFG
+  }
 \KKcodeE
-
-\KKvLNChange{style=2}
-\KKverb|
-
-\long\def\foo{%
-  ABC DEF EFG
-}
-
-|
 
 \KKvUsePreset{LuaStyle}
 
-\KKverb|if A == B then else A_if B_else end|
+\KKcodeS+
+  -- test comment
+  function KKV.encode_tail(str)
+    local s = (str .. "\n"):gsub(ltjflg, "\n")
+    return KKV.encode(s)
+  end
+\KKcodeE
 
 \end{document}
