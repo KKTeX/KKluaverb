@@ -111,8 +111,8 @@ function KKV.decode(rstr)
       last_idx = last_idx - 1
     end
     tex.sprint("\\par\\noindent")
-    for i = 1, last_idx do
-      tex.sprint("\\phantom{\\KKlvLineNumber{" .. (i + fl_linenumber) .. "}}")
+    for i = 2, last_idx do
+      tex.sprint("\\phantom{\\KKlvLineNumber{" .. (i - 1 + fl_linenumber) .. "}}")
       local content = dc_lines[i]
       if content ~= "" then
         local map_to_use = KKV.active_map or {}
@@ -142,8 +142,8 @@ function KKV.decode(rstr)
       last_idx = last_idx - 1
     end
     tex.sprint("\\par\\noindent")
-    for i = 1, last_idx do
-      tex.sprint("\\KKlvLineNumber{" .. (i + fl_linenumber) .. "}")
+    for i = 2, last_idx do
+      tex.sprint("\\KKlvLineNumber{" .. (i - 1 + fl_linenumber) .. "}")
       local content = dc_lines[i]
       if content ~= "" then
         local map_to_use = KKV.active_map or {}
@@ -220,10 +220,32 @@ function KKV.scanner_for_verb(line)
         table.insert(res, transform)
 
         pos = e_short_idx + 1 + skip_len
+
+        -- NOTE#1
+        -- This part was added 
+        -- in order to avoid being inserted
+        -- unwanted space to the first line 
+        -- when the flag is 1 or 2. 
+        if not line:find(shortcut_end, pos, true) then
+          local sc_content = line:sub(pos)
+          table.insert(res, KKV.encode_tail(sc_content) .. "%")
+          pos = #line + 1 
+        end
       elseif s_idx then
         in_process = true 
         table.insert(res, line:sub(pos, s_idx - 1) .. CMD_INIT)
         pos = e_idx + 1
+
+        -- NOTE#1
+        -- This part was added 
+        -- in order to avoid being inserted
+        -- unwanted space to the first line 
+        -- when the flag is 1 or 2. 
+        if not line:find(trm, pos, true) then
+          local sc_content = line:sub(pos)
+          table.insert(res, KKV.encode_tail(sc_content) .. "%")
+          pos = #line + 1
+        end
       else
         table.insert(res, line:sub(pos))
         break

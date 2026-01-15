@@ -25,20 +25,29 @@
     options = { word_boundary = true }
   }
 \end{luacode*}
-
+\KKvSetMap{ }{␣}
 \begin{document}
 
 \KKvUsePreset{TeXStyle}
 
-\KKverb|\def\test\ifあああ\elseいいい\fi|
+\KKverb|\def\test\ifああ
+あ\elseいいい\fi|
 
 \KKcodeS+
-
-    \long\def\foo{%
-      ABC DEF EFG
-    }
+\long\def\foo{%
+  ABC DEF EFG
+}
 
 \KKcodeE
+
+\KKvLNChange{style=2}
+\KKverb|
+
+\long\def\foo{%
+  ABC DEF EFG
+}
+
+|
 
 \KKvUsePreset{LuaStyle}
 
