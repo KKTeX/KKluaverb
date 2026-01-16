@@ -1,14 +1,34 @@
 \documentclass{ltjsarticle}
-\usepackage{KKluaverb}
+\usepackage{KKluaverb, luwa-ul}
 
 \begin{luacode*}
   KKLuaVerb.presets["TeXStyle"] = {
     map = { 
-      brown = { [[\def]], [[\begin]], [[\end]], [[\long]] },
-      Magenta  = { [[\if]], [[\else]], [[\fi]] },
+      DarkCyan = { [[{]], [[}]] },              
+      OrangeRed = { "[", "]" },
+      DeepPink = { [[(]], [[)]] },              
+      DarkGoldenrod = { [[&]], [[$]], [[^]], [[_]] },
+
+      CornflowerBlue = { 
+        [[\documentclass]], [[\usepackage]], [[\begin]], [[\end]], 
+        [[\section]], [[\subsection]], [[\chapter]], 
+        [[\makeatletter]], [[\makeatother]], [[\ExplSyntaxOn]], [[\ExplSyntaxOff]] 
+      },
+      
+      MediumPurple = { 
+        [[\def]], [[\edef]], [[\gdef]], [[\xdef]], 
+        [[\newcommand]], [[\renewcommand]], [[\providecommand]],
+        [[\let]], [[\setcopy]], [[\long]], [[\global]]
+      },
+
+      Magenta = { 
+        [[\if]], [[\else]], [[\fi]], [[\ifx]], [[\ifdefined]], 
+        [[\ifnum]], [[\ifdim]], [[\loop]], [[\repeat]], [[\repeat]]
+      },
     }, 
+    
     options = { 
-      word_boundary = false,
+      word_boundary = false,  
       comment_char = "%",     
       comment_color = "ForestGreen", 
       escape_char = "\\"      
@@ -35,14 +55,47 @@
 
 \KKvUsePreset{TeXStyle}
 
-\KKverb|\def\test\ifああ
-あ\elseいいい\fi|
+\underLineKKAuto{Math Mode Test: \KKverb|$a + b = c$|}
 
 \KKcodeS
-      % test comment
-      \long\def\foo{%
-        ABC DEF EFG
-      }
+% 1行目のコメント保護とインデントのテスト
+\long\def\myprog#1{%
+  \ifx#1\empty
+    \relax
+  \else
+    \message{Processing...}%
+    #1
+  \fi
+}
+\KKcodeE
+
+ここでも使えます\footnote{脚注の中でも \KKcodeS \def\bar{baz} \KKcodeE と書けるのが KKluaverb の強みです。}。
+
+\begin{enumerate}
+\item 箇条書きの項目の中でも：
+    \KKcodeS+
+    \begin{itemize}
+      \item nested item
+    \end{itemize}
+    \KKcodeE
+\end{enumerate}
+
+\KKcodeS+
+% ここは行番号が出るはず
+\usepackage{xcolor}
+\usepackage{KKluaverb}
+
+\begin{document}
+  Hello, KKTeX!
+\end{document}
+\KKcodeE
+
+\noindent
+1行完結のテスト：\KKcodeS \long\def\test#1{#1} \KKcodeE です。
+
+記号のテスト：
+\KKcodeS
+{ [ \ ( \% \$ # & _ ^ ) / ] }
 \KKcodeE
 
 \KKvUsePreset{LuaStyle}

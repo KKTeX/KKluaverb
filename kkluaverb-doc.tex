@@ -29,6 +29,41 @@
 %%%
 
 
+%%% mapping
+\begin{luacode*}
+  KKLuaVerb.presets["TeXStyle"] = {
+    map = { 
+      DarkCyan = { [[{]], [[}]], [[&]], [[$]], [[^]], [[_]] },
+
+      CornflowerBlue = { 
+        [[\documentclass]], [[\usepackage]], [[\begin]], [[\end]], 
+        [[\section]], [[\subsection]], [[\chapter]], 
+        [[\makeatletter]], [[\makeatother]], [[\ExplSyntaxOn]], [[\ExplSyntaxOff]] 
+      },
+      
+      MediumPurple = { 
+        [[\def]], [[\edef]], [[\gdef]], [[\xdef]], 
+        [[\newcommand]], [[\renewcommand]], [[\providecommand]],
+        [[\let]], [[\setcopy]], [[\long]], [[\global]]
+      },
+
+      Magenta = { 
+        [[\if]], [[\else]], [[\fi]], [[\ifx]], [[\ifdefined]], 
+        [[\ifnum]], [[\ifdim]], [[\loop]], [[\repeat]], [[\repeat]]
+      },
+    }, 
+    
+    options = { 
+      word_boundary = false,  
+      comment_char = "%",     
+      comment_color = "ForestGreen", 
+      escape_char = "\\"      
+    }
+  }
+\end{luacode*}
+%%%
+
+
 %%% hyperref
 \usepackage{hyperref} 
 \hypersetup{
@@ -119,7 +154,7 @@ fonttitle=\ascb@gtfamily, IfValueTF={#1}{title=\hspace*{.1em}【#2】〈#1〉\hs
 %%% titlepage
 \title{\texttt{KKluaverb} Package Documentation}
 \author{Kosei Kawaguchi a.k.a. KKTeX}
-\date{Version 1.5.0 (2026/01/12)}
+\date{Version 2.0.1 (2026/01/16)}
 %%%
 
 \begin{document}

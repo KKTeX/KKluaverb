@@ -8,8 +8,8 @@
 
 luatexbase.provides_module{
   name     = 'KKluaverb',
-  date     = '2026/01/15',
-  version  = '2.0.0',
+  date     = '2026/01/16',
+  version  = '2.0.1',
 }
 
 ----- for .sty interface -----
@@ -107,9 +107,8 @@ function KKV.decode(rstr)
       table.insert(dc_lines, line)
     end
     local last_idx = #dc_lines
-    if dc_lines[last_idx] == "" then
-      last_idx = last_idx - 1
-    end
+    last_idx = last_idx - 1
+      -- Delete the last line.
     tex.sprint("\\par\\noindent")
     for i = 2, last_idx do -- ref: NOTE#1
       local content = dc_lines[i]
@@ -137,9 +136,8 @@ function KKV.decode(rstr)
       table.insert(dc_lines, line)
     end
     local last_idx = #dc_lines
-    if dc_lines[last_idx] == "" then
-      last_idx = last_idx - 1
-    end
+    last_idx = last_idx - 1
+      -- Delete the last line.
     tex.sprint("\\par\\noindent")
     for i = 2, last_idx do -- ref: NOTE#1
       tex.sprint("\\KKlvLineNumber{" .. (i - 1 + fl_linenumber) .. "}")
