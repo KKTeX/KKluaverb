@@ -70,8 +70,9 @@
 \KKcodeE
 
 ここでも使えます\footnote{脚注の中でも
-\KKcodeS
+\KKcodeS+
   \def\bar{baz} 
+  これは\bar です
 \KKcodeE 
 \noindent と書けるのが KKluaverb の強みです。}。
 
@@ -94,8 +95,7 @@
 \end{document}
 \KKcodeE
 
-\noindent
-1行完結のテスト：\KKcodeS \long\def\test#1{#1} \KKcodeE です。
+1行完結のテスト：\KKverb|\long\def\test#1{#1}|です。
 
 記号のテスト：
 \KKcodeS
