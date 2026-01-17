@@ -4,26 +4,26 @@
 \begin{luacode*}
   KKLuaVerb.presets["TeXStyle"] = {
     map = { 
-      DarkCyan = { [[{]], [[}]] },              
+      DarkCyan = { "{", "}" },              
       OrangeRed = { "[", "]" },
-      DeepPink = { [[(]], [[)]] },              
-      DarkGoldenrod = { [[&]], [[$]], [[^]], [[_]] },
+      DeepPink = { "(", ")" },              
+      DarkGoldenrod = { "&", "$", "^", "_" },
 
       CornflowerBlue = { 
-        [[\documentclass]], [[\usepackage]], [[\begin]], [[\end]], 
-        [[\section]], [[\subsection]], [[\chapter]], 
-        [[\makeatletter]], [[\makeatother]], [[\ExplSyntaxOn]], [[\ExplSyntaxOff]] 
+        "\\documentclass", "\\usepackage", "\\begin", "\\end", 
+        "\\section", "\\subsection", "\\chapter", 
+        "\\makeatletter", "\\makeatother", "\\ExplSyntaxOn", "\\ExplSyntaxOff" 
       },
       
       MediumPurple = { 
-        [[\def]], [[\edef]], [[\gdef]], [[\xdef]], 
-        [[\newcommand]], [[\renewcommand]], [[\providecommand]],
-        [[\let]], [[\setcopy]], [[\long]], [[\global]]
+        "\\def", "\\edef", "\\gdef", "\\xdef", 
+        "\\newcommand", "\\renewcommand", "\\providecommand",
+        "\\let", "\\setcopy", "\\long", "\\global"
       },
 
       Magenta = { 
-        [[\if]], [[\else]], [[\fi]], [[\ifx]], [[\ifdefined]], 
-        [[\ifnum]], [[\ifdim]], [[\loop]], [[\repeat]], [[\repeat]]
+        "\\if", "\\else", "\\fi", "\\ifx", "\\ifdefined", 
+        "\\ifnum", "\\ifdim", "\\loop", "\\repeat"
       },
     }, 
     
@@ -39,20 +39,32 @@
 \begin{luacode*}
   KKLuaVerb.presets["LuaStyle"] = {
     map = { 
-      Magenta = { [[if]], [[else]], [[then]], [[elseif]] , [[end]] , [[for]] , [[function]], [[return]]},
-      ProcessBlue  = { [[local]] , [[true]], [[false]]}
+      Magenta = { 
+        "if", "then", "else", "elseif", "end", 
+        "for", "while", "repeat", "until", "in",
+        "do", "break", "return", "function" 
+      },
+
+      ProcessBlue = { "local", "true", "false", "nil" },
+      DarkGoldenrod = { 
+        "print", "require", "type", "tostring", "tonumber",
+        "table", "string", "math", "io", "os", "debug", "coroutine",
+        "self" 
+      },
+
+      DarkCyan = { "{", "}", "[", "]", "(", ")", "=", "+", "-", "*", "/", "#", "..", "==" }
     },
     options = { 
-      word_boundary = true,
+      word_boundary = true,   
       comment_char = "--",     
       comment_color = "Cerulean", 
-      escape_char = "%"      
+      escape_char = "%"       
     }
   }
 \end{luacode*}
 
 \begin{document}
-
+\section{\KKverb|\KKvUsePreset{TeXStyle}| Test}
 \KKvUsePreset{TeXStyle}
 
 \underLineKKAuto{Math Mode Test: \KKverb|$a + b = c$|}
@@ -102,6 +114,7 @@
 { [ \ ( \% \$ # & _ ^ ) / ] }
 \KKcodeE
 
+\section{\KKverb|\KKvUsePreset{LuaStyle}| Test}
 \KKvUsePreset{LuaStyle}
 
 \KKcodeS
@@ -112,4 +125,51 @@
   end
 \KKcodeE
 
+\KKcodeS
+-- 制御構文と論理値のテスト
+local function check_status(flag)
+  if flag == true then
+    print("Status is OK! )
+  elseif flag == false then
+    print("Status is Error... ")
+  else
+    print("Status is nil.")
+  end
+end
+\KKcodeE
+
+\KKcodeS+
+-- ループと標準ライブラリのテスト
+local data = { "Apple", "Banana", "Cherry" }
+
+for i, v in ipairs(data) do
+  local msg = string.format("Item %d: %s", i, v)
+  table.insert(results, msg)
+  print(msg)
+end
+\KKcodeE
+
+\KKcodeS
+-- 演算子と文字列操作のテスト
+function KKV.process(text)
+  local len = #text
+  local result = "{ " .. text .. " }" -- 連結演算子
+  return result
+end
+
+local my_table = { key = "value", num = 123 }
+\KKcodeE
+
+\KKcodeS+
+-- KKVの内部ロジックをシミュレート
+function KKV.encode(str)
+  local res = str:gsub(".", function(c)
+    return string.format("%%%02X", string.byte(c))
+  end)
+  return res
+end
+
+local output = KKV.encode("Hello KKTeX!")
+print(output)
+\KKcodeE
 \end{document}

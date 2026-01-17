@@ -18,7 +18,7 @@ buildsample:
 	$(MAKE) clean
 
 buildtest1:
-	$(MAKE) distclean
+# 	$(MAKE) distclean
 	latexmk -r $(RC) $(TEST1_TARGET).tex
 	$(MAKE) clean
 

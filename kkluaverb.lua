@@ -185,10 +185,8 @@ function KKV.scanner_for_verb(line)
   local pos = 1 -- the character index
   local res = {} -- a transformed chunk
   local start_cmd = DEFAULT_STARTER .. ini
-  -- testA
   local shortcut_start = DEFAULT_STARTER_flag1
   local shortcut_end = DEFAULT_TERMINATOR_flag1
-  --
 
   -- While the character index 
   -- <= the length of the line,
@@ -200,7 +198,6 @@ function KKV.scanner_for_verb(line)
       -- for \KKcodeS, E
       local s_short_idx, e_short_idx = line:find(shortcut_start, pos, true)
 
-      -- testA
       if s_short_idx and (not s_idx or s_short_idx < s_idx) then
         in_process = true
 
@@ -244,10 +241,10 @@ function KKV.scanner_for_verb(line)
           pos = #line + 1
         end
       else
-        table.insert(res, line:sub(pos))
+        local sc_content = line:sub(pos)
+        table.insert(res, sc_content)
         break
       end
-      --
 
     else
       local s_idx, e_idx = line:find(trm, pos, true)
@@ -299,10 +296,15 @@ function KKV.cut_multiple_tokens(line, targets, options)
         local is_valid = true 
         
         if use_boundary then
+          -- Get the previous and next characters.
           local prev_char = s > 1 and line:sub(s-1, s-1) or nil
           local next_char = e < #line and line:sub(e+1, e+1) or nil
           
-          if is_alnum(prev_char) or is_alnum(next_char) then
+          -- Check the tokens.
+          if is_alnum(token:sub(1, 1)) and is_alnum(prev_char) then
+            is_valid = false
+          end
+          if is_alnum(token:sub(-1, -1)) and is_alnum(next_char) then
             is_valid = false
           end
         end
@@ -382,8 +384,8 @@ function KKV.output_with_multiple_colors(line, color_map, allow_comments)
 
   for _, p in ipairs(parts) do
     if p.type == "token" then
-      local c = token_to_color[p.content] or "black" 
-      tex.sprint("\\textcolor{" .. c .. "}{")
+      local t_color = token_to_color[p.content] or "black" 
+      tex.sprint("\\textcolor{" .. t_color .. "}{")
       tex.sprint(-2, p.content)
       tex.sprint("}")
     else

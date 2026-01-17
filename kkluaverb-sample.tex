@@ -36,11 +36,31 @@ fonttitle=\ascb@gtfamily, IfValueTF={#1}{title=【#2】〈#1〉}{title=【#2】,
 \begin{luacode*}
   KKLuaVerb.presets["TeXStyle"] = {
     map = { 
-      brown = { [[\def]], [[\begin]], [[\end]], [[\long]] },
-      Magenta  = { [[\if]], [[\else]], [[\fi]] },
+      DarkCyan = { "{", "}" },              
+      OrangeRed = { "[", "]" },
+      DeepPink = { "(", ")" },              
+      DarkGoldenrod = { "&", "$", "^", "_" },
+
+      CornflowerBlue = { 
+        "\\documentclass", "\\usepackage", "\\begin", "\\end", 
+        "\\section", "\\subsection", "\\chapter", 
+        "\\makeatletter", "\\makeatother", "\\ExplSyntaxOn", "\\ExplSyntaxOff" 
+      },
+      
+      MediumPurple = { 
+        "\\def", "\\edef", "\\gdef", "\\xdef", 
+        "\\newcommand", "\\renewcommand", "\\providecommand",
+        "\\let", "\\setcopy", "\\long", "\\global"
+      },
+
+      Magenta = { 
+        "\\if", "\\else", "\\fi", "\\ifx", "\\ifdefined", 
+        "\\ifnum", "\\ifdim", "\\loop", "\\repeat"
+      },
     }, 
+    
     options = { 
-      word_boundary = false,
+      word_boundary = false,  
       comment_char = "%",     
       comment_color = "ForestGreen", 
       escape_char = "\\"      
@@ -51,14 +71,26 @@ fonttitle=\ascb@gtfamily, IfValueTF={#1}{title=【#2】〈#1〉}{title=【#2】,
 \begin{luacode*}
   KKLuaVerb.presets["LuaStyle"] = {
     map = { 
-      Magenta = { [[if]], [[else]], [[then]], [[elseif]] , [[end]] , [[for]] , [[function]], [[return]]},
-      ProcessBlue  = { [[local]] , [[true]], [[false]]}
+      Magenta = { 
+        "if", "then", "else", "elseif", "end", 
+        "for", "while", "repeat", "until", "in",
+        "do", "break", "return", "function" 
+      },
+
+      ProcessBlue = { "local", "true", "false", "nil" },
+      DarkGoldenrod = { 
+        "print", "require", "type", "tostring", "tonumber",
+        "table", "string", "math", "io", "os", "debug", "coroutine",
+        "self" 
+      },
+
+      DarkCyan = { "{", "}", "[", "]", "(", ")", "=", "+", "-", "*", "/", "#", "..", "==" }
     },
     options = { 
-      word_boundary = true,
+      word_boundary = true,   
       comment_char = "--",     
       comment_color = "Cerulean", 
-      escape_char = "%"      
+      escape_char = "%"       
     }
   }
 \end{luacode*}
@@ -66,7 +98,7 @@ fonttitle=\ascb@gtfamily, IfValueTF={#1}{title=【#2】〈#1〉}{title=【#2】,
 \makeindex
 
 \begin{document}
-\KKvUsePreset{LuaStyle}
+\KKvUsePreset{TeXStyle}
 
 \tableofcontents
 \listoftables
@@ -128,7 +160,7 @@ Line 3
 \section{Advanced Multi-line \& Box Stress Test}
 
 %%% Remain to be enhanced...
-\begin{simple}{Multi-language Code Test (Numbered)}
+\begin{simple}{Multi-language Code Test (Numbered)}\KKvUsePreset{LuaStyle}
 ああああああああああああああああああああ
 ああああああああああああああああああああ
 ああああああああああああああああああああ
@@ -183,6 +215,7 @@ abcみたいな英字でも、
 \end{simple}
 
 \section{Indexing Strategy Test}
+\KKvUsePreset{TeXStyle}
 
 \index{Alphabet@\KKverb|Alphabet Mapping: A|}
 \index{Symbol@\KKverb|Symbol: # $ $ % &|}
