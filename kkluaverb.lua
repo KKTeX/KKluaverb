@@ -166,7 +166,7 @@ end
 
 ----- scanner -----
 function KKV.scanner_for_verb(line)
-  -- If the sccanner is unabled, it returns nil.
+  -- If the scanner is unabled, it returns nil.
   if not KKLuaVerb.enabled then return nil end
 
   -- When the process_input_buffer runs,

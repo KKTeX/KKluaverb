@@ -33,24 +33,31 @@
 \begin{luacode*}
   KKLuaVerb.presets["TeXStyle"] = {
     map = { 
-      DarkCyan = { [[{]], [[}]], [[&]], [[$]], [[^]], [[_]] },
+      DarkCyan = { "{", "}" },              
+      OrangeRed = { "[", "]" },
+      DeepPink = { "(", ")" },              
+      DarkGoldenrod = { "&", "$", "^", "_" },
 
       CornflowerBlue = { 
-        [[\documentclass]], [[\usepackage]], [[\begin]], [[\end]], 
-        [[\section]], [[\subsection]], [[\chapter]], 
-        [[\makeatletter]], [[\makeatother]], [[\ExplSyntaxOn]], [[\ExplSyntaxOff]] 
+        "\\documentclass", "\\usepackage", "\\begin", "\\end", 
+        "\\section", "\\subsection", "\\chapter", 
+        "\\makeatletter", "\\makeatother", "\\ExplSyntaxOn", "\\ExplSyntaxOff" 
       },
       
       MediumPurple = { 
-        [[\def]], [[\edef]], [[\gdef]], [[\xdef]], 
-        [[\newcommand]], [[\renewcommand]], [[\providecommand]],
-        [[\let]], [[\setcopy]], [[\long]], [[\global]]
+        "\\def", "\\edef", "\\gdef", "\\xdef", 
+        "\\newcommand", "\\renewcommand", "\\providecommand",
+        "\\let", "\\setcopy", "\\long", "\\global"
       },
 
       Magenta = { 
-        [[\if]], [[\else]], [[\fi]], [[\ifx]], [[\ifdefined]], 
-        [[\ifnum]], [[\ifdim]], [[\loop]], [[\repeat]], [[\repeat]]
+        "\\if", "\\else", "\\fi", "\\ifx", "\\ifdefined", 
+        "\\ifnum", "\\ifdim", "\\loop", "\\repeat", "\\noexpand"
       },
+
+      IndianRed = {
+        "\\KKlvStart*", "\\KKlvEnd*"
+      }
     }, 
     
     options = { 
@@ -58,6 +65,33 @@
       comment_char = "%",     
       comment_color = "ForestGreen", 
       escape_char = "\\"      
+    }
+  }
+\end{luacode*}
+
+\begin{luacode*}
+  KKLuaVerb.presets["LuaStyle"] = {
+    map = { 
+      Magenta = { 
+        "if", "then", "else", "elseif", "end", 
+        "for", "while", "repeat", "until", "in",
+        "do", "break", "return", "function" 
+      },
+
+      ProcessBlue = { "local", "true", "false", "nil" },
+      DarkGoldenrod = { 
+        "print", "require", "type", "tostring", "tonumber",
+        "table", "string", "math", "io", "os", "debug", "coroutine",
+        "self" 
+      },
+
+      DarkCyan = { "{", "}", "[", "]", "(", ")", "=", "+", "-", "*", "/", "#", "..", "==" }
+    },
+    options = { 
+      word_boundary = true,   
+      comment_char = "--",     
+      comment_color = "Cerulean", 
+      escape_char = "%"       
     }
   }
 \end{luacode*}
@@ -158,6 +192,8 @@ fonttitle=\ascb@gtfamily, IfValueTF={#1}{title=\hspace*{.1em}【#2】〈#1〉\hs
 %%%
 
 \begin{document}
+\KKvUsePreset{TeXStyle}
+
 %%% title and toc
 \begin{titlepage}
   \maketitle
@@ -176,8 +212,8 @@ package: \url{https://gist.github.com/zr-tex8r/c7901658a866adfcd3cd66b6dfa86997}
 article: \url{https://zrbabbler.hatenablog.com/entry/20181222/1545495849}}.
 
 \section{Usage}
-\subsection{Basical Useage}
-As mentioned in the ``Outline'' seciton, this package mainly provides enhanced \KKverb|\verb| command. The usage is not much different from the normal one.
+\subsection{Basic Usage of \KKverb|\KKverb|}
+As mentioned in the ``Outline'' section, this package mainly provides enhanced \KKverb|\verb| command. The usage is not much different from the normal one.
 
 \KKvScanOff
 \begin{SourceCode}{Input}{TeX}
@@ -189,14 +225,14 @@ As mentioned in the ``Outline'' seciton, this package mainly provides enhanced \
 \end{OutPut}
 
 \subsection{In Verbatim Environments}
-When this package is loaded, the Lua-sccaning which enables \KKverb|\KKverb| to detokenize its argument is activated.
+When this package is loaded, the Lua-scanning which enables \KKverb|\KKverb| to detokenize its argument is activated.
 However, when \KKverb|\KKverb| used in verbatim environments such as ``lstlistings'' and ``tcblisting'', the argument cannot be decoded properly.
-\namiKK{In such cases, you should use \KKverb|\KKvScanOff| which deactivates the sccaning process used internally in \KKverb|KKverb.lua|.} Of course, \KKverb|\KKvScanOn| re-activetes the process.
+\namiKK{In such cases, you should use \KKverb|\KKvScanOff| which deactivates the scanning process used internally in \KKverb|KKverb.lua|.} Of course, \KKverb|\KKvScanOn| re-activates the process.
 
-\subsection{Optional Useage}
+\subsection{Optional Usage}
 In addition to the main function of \KKverb|\KKverb|, some optional funcions are provided.
 
-\KKverb|\KKvOpChange| can change font and color of the output of \KKverb|\KKverb|. Also, it can activate or deactivate the sccaner.
+\KKverb|\KKvOpChange| can change font and color of the output of \KKverb|\KKverb|. Also, it can activate or deactivate the scanner.
 The usage is as follows:
 
 \KKvScanOff
@@ -210,7 +246,7 @@ The usage is as follows:
   \KKverb|\def\TEST{Test Text.}|}
 \end{OutPut}
 
-\begin{center}
+\bigskip\begin{center}
   \captionof{table}{Default Values of \KKverb|\KKvOpChange|}
   \begin{tblr}{
     colspec = {l l l},
@@ -224,7 +260,25 @@ The usage is as follows:
     color & \KKverb|color| & Sets the text color (requires xcolor). \\
     enabled & \KKverb|true| & Activates or deactivates the scanning engine. \\
   \end{tblr}
-\end{center}
+\end{center}\bigskip
+
+Additionally, the \KKverb|enabled| option functions the same as \KKverb|\KKvScanOn| and \KKverb|\KKvScanOff|.
+
+\subsection{Behavior in TOC, Index etc.}
+One of the strong points of \KKverb|\KKverb| is that it can be used in table of contents, index, and footnotes and more. 
+While the traditional \KKverb|\verb| command always causes an error in such contexts, \KKverb|\KKverb| does not. This is achieved through the following logic, using the TOC as an example.
+
+When the TeX system generates the TOC, it produces an auxiliary file with the extension \KKverb|.toc|. In this file, entry data is typically stored in an expanded state. 
+
+However, this package requires the raw text data to be passed unexpanded. This is because the text must be intercepted and processed by \KKverb|process_input_buffer| before TeX's tokenizer converts it into tokens. To resolve this, I implemented a mechanism that automatically prepends the \KKverb|\unexpanded| command to the starter flag when writing to auxiliary files: 
+
+\KKcodeS+
+% In TOC
+\noexpand\KKlvStart*<encoded tests>\noexpand\KKlvEnd*%
+\KKcodeE
+
+Then, the content of the \KKverb|.toc| file is processed by TeX in the usual way subsequently, because the \KKverb|\unexpanded| is no longer present.
+
 
 \end{document}
 
