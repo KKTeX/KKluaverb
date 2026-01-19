@@ -212,7 +212,7 @@ package: \url{https://gist.github.com/zr-tex8r/c7901658a866adfcd3cd66b6dfa86997}
 article: \url{https://zrbabbler.hatenablog.com/entry/20181222/1545495849}}.
 
 \section{Usage}
-\subsection{Basic Usage of \KKverb|\KKverb|}
+\subsection{Basic Usage of Lua-enhanced \KKverb|\verb|}
 As mentioned in the ``Outline'' section, this package mainly provides enhanced \KKverb|\verb| command. The usage is not much different from the normal one.
 
 \KKvScanOff
@@ -279,6 +279,40 @@ However, this package requires the raw text data to be passed unexpanded. This i
 
 Then, the content of the \KKverb|.toc| file is processed by TeX in the usual way subsequently, because the \KKverb|\unexpanded| is no longer present.
 
+\subsection{Basic Usage of Lua-enhanced \KKverb|lstlisting|}
+\KKvScanOff
+\verb|\KKcodeS| and \verb|\KKcodeE| provide an environment-like output which is very close to the \verb|lstlisting|.
+The usage is very simple. The code between \verb|\KKcodeS| and \verb|\KKcodeE| is rendered as raw texts.
+
+If you want to attach linenumbers to the left of the each line, \verb|\KKcodeS+| will meet the request. Please note that you do not need to type \verb|\KKcodeE+|. \verb|\KKcodeS+| and \verb|\KKcodeE| is the proper pair.
+
+\begin{SourceCode}{Input}{TeX}
+  \KKcodeS+
+  % A sample command
+  \long\def\myprog#1{%
+    \ifx#1\empty
+      \relax
+    \else
+      \message{Processing...}%
+      #1
+    \fi
+  }
+  \KKcodeE
+\end{SourceCode}
+\KKvScanOn
+\begin{OutPut}{Output}
+\KKcodeS+
+% A sample command
+\long\def\myprog#1{%
+  \ifx#1\empty
+    \relax
+  \else
+    \message{Processing...}%
+    #1
+  \fi
+}
+\KKcodeE
+\end{OutPut}
 
 \end{document}
 
