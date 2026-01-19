@@ -211,8 +211,8 @@ In devoloping this package, I made use of an algorithm which is used in ``bxraws
 package: \url{https://gist.github.com/zr-tex8r/c7901658a866adfcd3cd66b6dfa86997}\par
 article: \url{https://zrbabbler.hatenablog.com/entry/20181222/1545495849}}.
 
-\section{Usage}
-\subsection{Basic Usage of Lua-enhanced \KKverb|\verb|}
+\section{Basic Usage of Lua-enhanced \KKverb|\verb|}
+\subsection{Fundamental Behavior}
 As mentioned in the ``Outline'' section, this package mainly provides enhanced \KKverb|\verb| command. The usage is not much different from the normal one.
 
 \KKvScanOff
@@ -223,6 +223,8 @@ As mentioned in the ``Outline'' section, this package mainly provides enhanced \
 \begin{OutPut}{Output}
   \KKverb|\def\TEST{Test Text.}|
 \end{OutPut}
+
+In the argument of the command, any linebreaks and blank lines are ignored. However, every space are preserved and rendered exactly as it appears.
 
 \subsection{In Verbatim Environments}
 When this package is loaded, the Lua-scanning which enables \KKverb|\KKverb| to detokenize its argument is activated.
@@ -279,7 +281,8 @@ However, this package requires the raw text data to be passed unexpanded. This i
 
 Then, the content of the \KKverb|.toc| file is processed by TeX in the usual way subsequently, because the \KKverb|\unexpanded| is no longer present.
 
-\subsection{Basic Usage of Lua-enhanced \KKverb|lstlisting|}
+\section{Basic Usage of Lua-enhanced \KKverb|lstlisting|}
+\subsection{Fundamental Behavior}
 \KKvScanOff
 \verb|\KKcodeS| and \verb|\KKcodeE| provide an environment-like output which is very close to the \verb|lstlisting|.
 The usage is very simple. The code between \verb|\KKcodeS| and \verb|\KKcodeE| is rendered as raw texts.
@@ -312,6 +315,33 @@ If you want to attach linenumbers to the left of the each line, \verb|\KKcodeS+|
   \fi
 }
 \KKcodeE
+\end{OutPut}
+
+When you use this Lua-based environment, please keep the following points in mind:
+
+\begin{itemize}
+  \item All indents and spaces are displayed.
+  \item Line breaks and blank lines are rendered exactly as they appear in the source.
+\end{itemize}
+
+\subsection{Additional Description}
+\KKvScanOff
+Some corner cases should be payed attention. 
+
+First, you cannot use \verb|\KKcodeS| and \verb|\KKcodeE| in the argument of \verb|\KKverb| command. When the sccaner is activated, \verb|\KKcodeS| forcibly starts the encoding system, even it is wrapped by \verb|\KKverb|. 
+
+Any text on the same line that falls "inside" the \verb|\KKcodeS| and \verb|\KKcodeE| boundaries is ignored, while text "outside" them is preserved. The following example will illustrate the behavior.
+
+\begin{SourceCode}{Input}{TeX}
+  Not ignored. \KKcodeS+ Ignored.
+  % Contents
+  Ignored. \KKcodeE Not ignored.
+\end{SourceCode}
+\KKvScanOn
+\begin{OutPut}{Output}
+Not ignored. \KKcodeS+ Ignored.
+% Contents
+Ignored. \KKcodeE Not ignored.
 \end{OutPut}
 
 \end{document}
