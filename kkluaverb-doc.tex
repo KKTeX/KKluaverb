@@ -328,7 +328,8 @@ When you use this Lua-based environment, please keep the following points in min
 \KKvScanOff
 Some corner cases should be payed attention. 
 
-First, you cannot use \verb|\KKcodeS| and \verb|\KKcodeE| in the argument of \verb|\KKverb| command. When the sccaner is activated, \verb|\KKcodeS| forcibly starts the encoding system, even it is wrapped by \verb|\KKverb|. 
+First, you cannot use \verb|\KKcodeS| and \verb|\KKcodeE| in the argument of \verb|\KKverb| command. When the scanner is activated, \verb|\KKcodeS| forcibly starts the encoding system, even it is wrapped by \verb|\KKverb|. 
+If you need to display \verb|\KKcodeS| and \verb|\KKcodeE| as they are, deactivate the scanner by \verb|\KKvScanOff| and use \verb|\verb|.
 
 Any text on the same line that falls "inside" the \verb|\KKcodeS| and \verb|\KKcodeE| boundaries is ignored, while text "outside" them is preserved. The following example will illustrate the behavior.
 
