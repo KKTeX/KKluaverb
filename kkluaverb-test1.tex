@@ -69,7 +69,7 @@
 
 \underLineKKAuto{Math Mode Test: \KKverb|$a + b = c$|}
 
-あああああああ\KKcodeS
+無視されない\KKcodeS 無視される
 % 1行目のコメント保護とインデントのテスト
 \long\def\myprog#1{%
   \ifx#1\empty
@@ -79,7 +79,13 @@
     #1
   \fi
 }
-いいいいいいい\KKcodeE
+無視される\KKcodeE 無視されない
+
+{\KKvOpChange{font=\sffamily}
+\KKcodeS
+\let\test\expandafter
+\KKcodeE
+}
 
 ここでも使えます\footnote{脚注の中でも
 \KKcodeS+

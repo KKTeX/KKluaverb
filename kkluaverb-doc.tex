@@ -249,7 +249,7 @@ The usage is as follows:
 \end{OutPut}
 
 \bigskip\begin{center}
-  \captionof{table}{Default Values of \KKverb|\KKvOpChange|}
+  \captionof{table}{\KKverb|\KKvOpChange|}
   \begin{tblr}{
     colspec = {l l l},
     hline{1,Z} = {0.8pt}, 
@@ -259,7 +259,7 @@ The usage is as follows:
   }
     Key & Default Value & Description \\
     font & \KKverb|\ttfamily| & Sets the font for the verbatim text. \\
-    color & \KKverb|color| & Sets the text color (requires xcolor). \\
+    color & \KKverb|black| & Sets the text color. \\
     enabled & \KKverb|true| & Activates or deactivates the scanning engine. \\
   \end{tblr}
 \end{center}\bigskip
@@ -324,6 +324,51 @@ When you use this Lua-based environment, please keep the following points in min
   \item Line breaks and blank lines are rendered exactly as they appear in the source.
 \end{itemize}
 
+\subsubsection{\KKverb|\KKvLNChange|}
+This command can change the style of the linenumbers.
+
+\bigskip\begin{center}
+  \captionof{table}{\KKverb|\KKvLNChange|}
+  \begin{tblr}{
+    colspec = {l l l},
+    hline{1,Z} = {0.8pt}, 
+    hline{2} = {.4pt}, 
+    column{1} = {font=\ttfamily}, 
+    row{1} = {font=\bfseries, bg=gray9}, 
+  }
+    Key & Default Value & Description \\
+    font & \KKverb|\ttfamily| & Sets the font for the linenumbers. \\
+    color & \KKverb|black!80| & Sets the color of the linenumbers. \\
+    size & \KKverb|\small| & Set the size of the linenumbers. \\
+    start & \KKverb|1| & Set the start number. \\
+    style & \KKverb|0| & Set the style. \\
+  \end{tblr}
+\end{center}\bigskip
+
+\KKvScanOff
+Please note that you do not have to use style key when you use this package in a normal way.
+This is because style1 and style2 are completely covered by \verb|\KKcodeS/E| or \verb|\KKcodeS+/E| environment.
+The following example illustrates this point.
+
+\begin{SourceCode}{Input}{TeX}
+  {\KKvLNChange{style=1}
+  \KKverb|
+  % contents
+  |}
+
+  \KKcodeS
+  % contents
+  \KKcodeE
+\end{SourceCode}
+
+\noindent The two above produce identical output. To summarize, 
+
+\begin{description}
+  \item[\texttt{style=0}] This is the normal usage of the \verb|\KKverb|.
+  \item[\texttt{style=1}] This style corresponds to \verb|\KKcodeS/E| environment.
+  \item[\texttt{style=2}] This style corresponds to \verb|\KKcodeS+/E| environment.
+\end{description}
+
 \subsection{Additional Description}
 \KKvScanOff
 Some corner cases should be payed attention. 
@@ -346,6 +391,9 @@ Not ignored. \KKcodeS+ Ignored.
 % Contents
 Ignored. \KKcodeE Not ignored.
 \end{OutPut}
+
+\section{Color Mapping}
+This package provides color-mapping option. You can specify the color of the keyword-color, comment-color, comment-token,  and escape-color.
 
 \end{document}
 
