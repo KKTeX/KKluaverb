@@ -194,7 +194,7 @@ fonttitle=\ascb@gtfamily, IfValueTF={#1}{title=\hspace*{.1em}【#2】〈#1〉\hs
 %%% titlepage
 \title{\texttt{KKluaverb} Package Documentation}
 \author{Kosei Kawaguchi a.k.a. KKTeX}
-\date{Version 2.0.1 (2026/01/16)}
+\date{Version 2.1.0 (2026/01/20)}
 %%%
 
 \begin{document}
@@ -523,7 +523,51 @@ $x = a + \frac{b}{c}$
 
 \section{Text Mapping}
 \KKvScanOff
-By using \verb|\KKvSetMap|, you can replace a certain text in the argument of \verb|\KKverb| and \verb|\KKcodeS/E| environment.
+By using \verb|\KKvSetMap|, you can replace a certain text in the argument of \verb|\KKverb| and \verb|\KKcodeS/E| environment. 
 
+\begin{SourceCode}{Input}{TeX}[Actual Use]
+  \KKvSetMap{!}{〈EXCLAMATION〉}
+  \KKvSetMap{?}{〈QUESTION〉}
+  
+  \KKverb|Wait, you really change them!?|
+
+  \KKvSetMap{!}{!}
+  \KKvSetMap{?}{?}
+  \KKverb|Oh, how can I reset them!?|
+\end{SourceCode}
+\KKvScanOn
+\begin{OutPut}{Output}
+\KKvSetMap{!}{〈EXCLAMATION〉}
+\KKvSetMap{?}{〈QUESTION〉}
+
+\KKverb|Wait, you really change them!?|
+
+\KKvSetMap{!}{!}
+\KKvSetMap{?}{?}
+\KKverb|Oh, how can I reset them!?|
+\end{OutPut}
+
+\KKvScanOff
+Using this, you can visualize all spaces in the argument of \verb|\KKverb| and \verb|\KKcodeS/E| environment. 
+\KKvScanOn
+\namiKK{However, you have to use \KKverb|\KKvSpaceForce| if you want to reset.} 
+By default, this package automatically replaces any spaces to Unicode character U+00A0 (Non-breaking Space). Therefore, you need to use the special command if you want to quit visualizing spaces.
+
+\KKvScanOff
+\begin{SourceCode}{Input}{TeX}[Actual Use]
+  \KKvSetMap{ }{␣}
+  \KKverb|  Look! All spaces are visualized!!  |
+
+  \KKvSpaceForce
+  \KKverb|  Oh, spaces are no longer visualized.  |
+\end{SourceCode}
+\KKvScanOn
+\begin{OutPut}{Output}
+\KKvSetMap{ }{␣}
+\KKverb|  Look! All spaces are visualized!!  |
+
+\KKvSpaceForce
+\KKverb|  Oh, spaces are no longer visualized.  |
+\end{OutPut}
 \end{document}
 
