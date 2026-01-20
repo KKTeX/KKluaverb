@@ -71,11 +71,13 @@
 
 \begin{document}
 \KKvUsePreset{TeXStyle}
+\KKvSetMap{ }{␣}
 \section{\KKverb|\KKvUsePreset{TeXStyle}| Test}
 
 \underLineKKAuto{Math Mode Test: \KKverb|$a + b = c$|}
 
 無視されない\KKcodeS 無視される
+
 % 1行目のコメント保護とインデントのテスト
 \long\def\myprog#1{%
   \ifx#1\empty
@@ -92,6 +94,8 @@
 \let\test\expandafter
 \KKcodeE
 }
+
+\KKvSpaceForce
 
 ここでも使えます\footnote{脚注の中でも
 \KKcodeS+
@@ -141,12 +145,12 @@ $x = a + \frac{b}{c}$
 \KKcodeS
 -- 制御構文と論理値のテスト
 local function check_status(flag)
-  if flag == true then
-    print("Status is OK! )
-  elseif flag == false then
-    print("Status is Error... ")
-  else
-    print("Status is nil.")
+    if flag == true then
+        print("Status is OK! )
+    elseif flag == false then
+        print("Status is Error... ")
+    else
+        print("Status is nil.")
   end
 end
 \KKcodeE
