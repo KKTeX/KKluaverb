@@ -1,6 +1,7 @@
 # ----- setting ------
 SAMPLE_TARGET = kkluaverb-sample
 TEST1_TARGET = kkluaverb-test1
+TEST2_TARGET = kkluaverb-test2
 DOC_TARGET = kkluaverb-doc
 RC     = .latexmkrc
 
@@ -20,6 +21,11 @@ buildsample:
 buildtest1:
 # 	$(MAKE) distclean
 	latexmk -r $(RC) $(TEST1_TARGET).tex
+	$(MAKE) clean
+
+buildtest2:
+# 	$(MAKE) distclean
+	latexmk -r $(RC) $(TEST2_TARGET).tex
 	$(MAKE) clean
 
 # cleaning except for PDF

@@ -61,7 +61,7 @@
     }, 
     
     options = { 
-      word_boundary = false,  
+      word_boundary = true,  
       comment_char = "%",     
       comment_color = "ForestGreen", 
       escape_char = "\\"      
@@ -393,7 +393,120 @@ Ignored. \KKcodeE Not ignored.
 \end{OutPut}
 
 \section{Color Mapping}
-This package provides color-mapping option. You can specify the color of the keyword-color, comment-color, comment-token,  and escape-color.
+\KKvScanOff
+\subsection{Basic Behavior}
+This package provides color-mapping option. You can specify the color of the keyword-color, comment-color, comment-token, etc. 
+In order to set a colormap, you should use \verb|luacode*| environment as follows:
+
+\begin{SourceCode}{Input}{TeX}
+  \begin{luacode*}
+    KKLuaVerb.presets["<name-of-style>"] = {
+      map = { 
+        <color1> = { "<token1>", "<token2>",... },              
+        <color2> = { "<token1>", "<token2>",... },
+        ...
+      }, 
+      
+      options = { 
+        word_boundary = true or false,  
+        comment_char = "<comment-token>",     
+        comment_color = "<comment-color>", 
+        escape_char = "<escape-token>"      
+      }
+    }
+  \end{luacode*}
+\end{SourceCode}
+
+You can set multiple presets, and can change or activate by \verb|\KKvUsePreset{<name-of-style>}| command. 
+
+\KKvScanOn\KKvUsePreset{LuaStyle}
+\subsection{The \KKverb|word_boundary| Option}
+The option controls how the scanner identifies the limits of a keyword during the tokenization process. 
+It determines whether a sequence of characters should be treated as a standalone keyword or as part of a larger string.
+
+\begin{description}
+  \item[When Disabled: \KKverb|false|] The scanner performs a raw string search. Any occurrence of the target token is highlighted, regardless of its surrounding characters. For example, if the keyword is \KKverb|if|, it will be highlighted even inside the word \KKverb|different|. 
+  \item[When Enabled (Default): \KKverb|true|] \KKvUsePreset{TeXStyle}This mode prevents unintended partial matching. It ensures that a keyword is highlighted only when it stands as a complete word. Crucially, symbols (such as \texttt{(}, \texttt{[}, \texttt{\#}, etc.) are automatically treated as boundaries. For example, \KKverb|\def#1| will result in \KKverb|\def| being highlighted, whereas the \KKvUsePreset{LuaStyle}\KKverb|if| inside \KKverb|different| will remain plain text.
+\end{description}
+
+\subsection{Example}
+\KKvScanOff
+
+\begin{SourceCode}{Input}{TeX}[Setting]
+  \begin{luacode*}
+    KKLuaVerb.presets["TeXStyle"] = {
+      map = { 
+        DarkCyan = { "{", "}" },              
+        OrangeRed = { "[", "]" },
+        DeepPink = { "(", ")" },              
+        DarkGoldenrod = { "&", "$", "^", "_" },
+
+        CornflowerBlue = { 
+          "\\documentclass", "\\usepackage", "\\begin", "\\end", 
+          "\\section", "\\subsection", "\\chapter", 
+          "\\makeatletter", "\\makeatother", "\\ExplSyntaxOn", "\\ExplSyntaxOff" 
+        },
+        
+        MediumPurple = { 
+          "\\def", "\\edef", "\\gdef", "\\xdef", 
+          "\\newcommand", "\\renewcommand", "\\providecommand",
+          "\\let", "\\setcopy", "\\long", "\\global"
+        },
+
+        Magenta = { 
+          "\\if", "\\else", "\\fi", "\\ifx", "\\ifdefined", 
+          "\\ifnum", "\\ifdim", "\\loop", "\\repeat", "\\noexpand"
+        },
+
+        IndianRed = {
+          "\\KKlvStart*", "\\KKlvEnd*"
+        }
+      }, 
+      
+      options = { 
+        word_boundary = true,  
+        comment_char = "%",     
+        comment_color = "ForestGreen", 
+        escape_char = "\\"      
+      }
+    }
+  \end{luacode*}
+\end{SourceCode}
+
+\begin{SourceCode}{Input}{TeX}[Actual Use]
+  \KKvUsePreset{TeXStyle} 
+
+  \KKcodeS+
+  \usepackage{xcolor}
+  \usepackage{KKluaverb}
+
+  \begin{document}
+    Hello, KKTeX!
+  \end{document}
+  \KKcodeE
+
+  \KKcodeS
+  { [ \ ( \% \$ # & _ ^ ) / ] }
+  \KKcodeE
+\end{SourceCode}
+
+\KKvScanOn
+\begin{OutPut}{Output}
+\KKvUsePreset{TeXStyle} 
+
+\KKcodeS+
+\usepackage{xcolor}
+\usepackage{KKluaverb}
+
+\begin{document}
+  Hello, KKTeX!
+\end{document}
+\KKcodeE
+
+\KKcodeS
+{ [ \ ( \% \$ # & _ ^ ) / ] }
+\KKcodeE
+\end{OutPut}
 
 \end{document}
 

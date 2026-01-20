@@ -1,0 +1,70 @@
+\documentclass{ltjsarticle}
+\usepackage{KKluaverb, luwa-ul}
+
+\begin{luacode*}
+  KKLuaVerb.presets["TeXStyle"] = {
+    map = { 
+      DarkCyan = { "{", "}" },              
+      OrangeRed = { "[", "]" },
+      DeepPink = { "(", ")" },              
+      DarkGoldenrod = { "&", "$", "^", "_" },
+
+      CornflowerBlue = { 
+        "\\documentclass", "\\usepackage", "\\begin", "\\end", 
+        "\\section", "\\subsection", "\\chapter", 
+        "\\makeatletter", "\\makeatother", "\\ExplSyntaxOn", "\\ExplSyntaxOff" 
+      },
+      
+      MediumPurple = { 
+        "\\def", "\\edef", "\\gdef", "\\xdef", 
+        "\\newcommand", "\\renewcommand", "\\providecommand",
+        "\\let", "\\setcopy", "\\long", "\\global"
+      },
+
+      Magenta = { 
+        "\\if", "\\else", "\\fi", "\\ifx", "\\ifdefined", 
+        "\\ifnum", "\\ifdim", "\\loop", "\\repeat"
+      },
+    }, 
+    
+    options = { 
+      word_boundary = true,  
+      comment_char = "%",     
+      comment_color = "ForestGreen", 
+      escape_char = "\\"      
+    }
+  }
+\end{luacode*}
+
+\begin{luacode*}
+  KKLuaVerb.presets["LuaStyle"] = {
+    map = { 
+      Magenta = { 
+        "if", "then", "else", "elseif", "end", 
+        "for", "while", "repeat", "until", "in",
+        "do", "break", "return", "function" 
+      },
+
+      ProcessBlue = { "local", "true", "false", "nil" },
+      DarkGoldenrod = { 
+        "print", "require", "type", "tostring", "tonumber",
+        "table", "string", "math", "io", "os", "debug", "coroutine",
+        "self" 
+      },
+
+      DarkCyan = { "{", "}", "[", "]", "(", ")", "=", "+", "-", "*", "/", "#", "..", "==" }
+    },
+    options = { 
+      word_boundary = true,   
+      comment_char = "--",     
+      comment_color = "Cerulean", 
+      escape_char = "%"       
+    }
+  }
+\end{luacode*}
+
+\begin{document}
+\KKvUsePreset{TeXStyle}
+
+\KKverb|\def#1|
+\end{document}

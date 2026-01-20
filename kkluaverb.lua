@@ -281,7 +281,10 @@ local function is_alnum(char)
 end
 
 function KKV.cut_multiple_tokens(line, targets, options)
-  local use_boundary = options and options.word_boundary
+  local use_boundary = true
+  if options and options.word_boundary ~= nil then
+    use_boundary = options.word_boundary
+  end
   local parts = {}
   local pos = 1
   
