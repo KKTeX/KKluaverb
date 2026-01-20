@@ -7,7 +7,7 @@
       DarkCyan = { "{", "}" },              
       OrangeRed = { "[", "]" },
       DeepPink = { "(", ")" },              
-      DarkGoldenrod = { "&", "$", "^", "_" },
+      DarkGoldenrod = { "&", "$", "^", "_", " \\ "},
 
       CornflowerBlue = { 
         "\\documentclass", "\\usepackage", "\\begin", "\\end", 
@@ -70,8 +70,8 @@
 \end{luacode*}
 
 \begin{document}
-\section{\KKverb|\KKvUsePreset{TeXStyle}| Test}
 \KKvUsePreset{TeXStyle}
+\section{\KKverb|\KKvUsePreset{TeXStyle}| Test}
 
 \underLineKKAuto{Math Mode Test: \KKverb|$a + b = c$|}
 
@@ -81,7 +81,7 @@
   \ifx#1\empty
     \relax
   \else
-    \message{Processing...}%
+    \message{Processing... \ }%
     #1
   \fi
 }
@@ -127,8 +127,8 @@
 $x = a + \frac{b}{c}$
 \KKcodeE
 
-\section{\KKverb|\KKvUsePreset{LuaStyle}| Test}
 \KKvUsePreset{LuaStyle}
+\section{\KKverb|\KKvUsePreset{LuaStyle}| Test}
 
 \KKcodeS
   -- test comment

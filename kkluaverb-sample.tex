@@ -39,7 +39,7 @@ fonttitle=\ascb@gtfamily, IfValueTF={#1}{title=【#2】〈#1〉}{title=【#2】,
       DarkCyan = { "{", "}" },              
       OrangeRed = { "[", "]" },
       DeepPink = { "(", ")" },              
-      DarkGoldenrod = { "&", "$", "^", "_" },
+      DarkGoldenrod = { "&", "$", "^", "_"},
 
       CornflowerBlue = { 
         "\\documentclass", "\\usepackage", "\\begin", "\\end", 
@@ -63,7 +63,10 @@ fonttitle=\ascb@gtfamily, IfValueTF={#1}{title=【#2】〈#1〉}{title=【#2】,
       word_boundary = true,  
       comment_char = "%",     
       comment_color = "ForestGreen", 
-      escape_char = "\\"      
+      escape_char = "\\",
+      delimiters = {
+        { start = '$', stop = '$', color = "SpringGreen3" },
+      }       
     }
   }
 \end{luacode*}
@@ -90,7 +93,10 @@ fonttitle=\ascb@gtfamily, IfValueTF={#1}{title=【#2】〈#1〉}{title=【#2】,
       word_boundary = true,   
       comment_char = "--",     
       comment_color = "Cerulean", 
-      escape_char = "%"       
+      escape_char = "%",
+      delimiters = {
+        { start = '"', stop = '"', color = "SkyBlue1" },
+      }      
     }
   }
 \end{luacode*}
