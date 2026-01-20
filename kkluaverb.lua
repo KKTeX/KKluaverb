@@ -8,8 +8,8 @@
 
 luatexbase.provides_module{
   name     = 'KKluaverb',
-  date     = '2026/01/16',
-  version  = '2.0.1',
+  date     = '2026/01/20',
+  version  = '2.1.0',
 }
 
 ----- for .sty interface -----
@@ -280,11 +280,40 @@ local function is_alnum(char)
   return char:match("[A-Za-z0-9_]") ~= nil
 end
 
+local function find_closing_delimiter(line, stop_char, start_pos, escape_char)
+  local search_pos = start_pos
+  while true do
+    local s = line:find(stop_char, search_pos, true)
+    if not s then return nil end 
+
+    local is_escaped = false
+    if escape_char and s > 1 and line:sub(s-1, s-1) == escape_char then
+      local count = 0
+      local p = s - 1
+      while p >= 1 and line:sub(p, p) == escape_char do
+        count = count + 1
+        p = p - 1
+      end
+      if count % 2 == 1 then is_escaped = true end
+    end
+
+    if not is_escaped then 
+      return s
+    end
+    
+    search_pos = s + 1
+  end
+end
+
 function KKV.cut_multiple_tokens(line, targets, options)
   local use_boundary = true
   if options and options.word_boundary ~= nil then
     use_boundary = options.word_boundary
   end
+  
+  local delims = (options and options.delimiters) or {}
+  local escape_char = (options and options.escape_char) or "\\"
+
   local parts = {}
   local pos = 1
   
@@ -292,6 +321,20 @@ function KKV.cut_multiple_tokens(line, targets, options)
     local nearest_s = nil
     local nearest_e = nil
     local found_token = nil
+    local found_delim_color = nil
+
+    for _, d in ipairs(delims) do
+      local s, _ = line:find(d.start, pos, true)
+      if s and (not nearest_s or s < nearest_s) then
+        local e = find_closing_delimiter(line, d.stop, s + #d.start, escape_char)
+        if e then
+          nearest_s = s
+          nearest_e = e + #d.stop - 1
+          found_token = nil 
+          found_delim_color = d.color
+        end
+      end
+    end
     
     for _, token in ipairs(targets) do
       local s, e = line:find(token, pos, true)
@@ -316,6 +359,7 @@ function KKV.cut_multiple_tokens(line, targets, options)
           nearest_s = s
           nearest_e = e
           found_token = token
+          found_delim_color = nil
         end
       end
     end
@@ -324,7 +368,15 @@ function KKV.cut_multiple_tokens(line, targets, options)
       if nearest_s > pos then
         table.insert(parts, { type = "plain", content = line:sub(pos, nearest_s - 1) })
       end
-      table.insert(parts, { type = "token", content = found_token })
+      if found_delim_color then
+        table.insert(parts, { 
+          type = "delim", 
+          content = line:sub(nearest_s, nearest_e), 
+          color = found_delim_color 
+        })
+      else
+        table.insert(parts, { type = "token", content = found_token })
+      end
       pos = nearest_e + 1
     else
       local rest = line:sub(pos)
@@ -389,6 +441,11 @@ function KKV.output_with_multiple_colors(line, color_map, allow_comments)
     if p.type == "token" then
       local t_color = token_to_color[p.content] or "black" 
       tex.sprint("\\textcolor{" .. t_color .. "}{")
+      tex.sprint(-2, p.content)
+      tex.sprint("}")
+    elseif p.type == "delim" then
+      local d_color = p.color or "black"
+      tex.sprint("\\textcolor{" .. d_color .. "}{")
       tex.sprint(-2, p.content)
       tex.sprint("}")
     else

@@ -64,7 +64,10 @@
       word_boundary = true,  
       comment_char = "%",     
       comment_color = "ForestGreen", 
-      escape_char = "\\"      
+      escape_char = "\\",
+      delimiters = {
+        { start = '$', stop = '$', color = "SpringGreen3" },
+      }         
     }
   }
 \end{luacode*}
@@ -91,7 +94,10 @@
       word_boundary = true,   
       comment_char = "--",     
       comment_color = "Cerulean", 
-      escape_char = "%"       
+      escape_char = "%",
+      delimiters = {
+        { start = '"', stop = '"', color = "SkyBlue1" },
+      }       
     }
   }
 \end{luacode*}
@@ -411,7 +417,10 @@ In order to set a colormap, you should use \verb|luacode*| environment as follow
         word_boundary = true or false,  
         comment_char = "<comment-token>",     
         comment_color = "<comment-color>", 
-        escape_char = "<escape-token>"      
+        escape_char = "<escape-token>",
+        delimiters = {
+          { start = '<starter>', stop = '<ender>', color = "<patial-color>" },
+        }       
       }
     }
   \end{luacode*}
@@ -467,7 +476,10 @@ It determines whether a sequence of characters should be treated as a standalone
         word_boundary = true,  
         comment_char = "%",     
         comment_color = "ForestGreen", 
-        escape_char = "\\"      
+        escape_char = "\\",
+        delimiters = {
+        { start = '$', stop = '$', color = "SpringGreen3" },
+      }        
       }
     }
   \end{luacode*}
@@ -505,6 +517,7 @@ It determines whether a sequence of characters should be treated as a standalone
 
 \KKcodeS
 { [ \ ( \% \$ # & _ ^ ) / ] }
+$x = a + \frac{b}{c}$
 \KKcodeE
 \end{OutPut}
 
