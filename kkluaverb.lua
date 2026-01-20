@@ -312,6 +312,7 @@ function KKV.cut_multiple_tokens(line, targets, options)
   end
   
   local delims = (options and options.delimiters) or {}
+
   local escape_char = (options and options.escape_char) or "\\"
 
   local parts = {}
@@ -369,11 +370,7 @@ function KKV.cut_multiple_tokens(line, targets, options)
         table.insert(parts, { type = "plain", content = line:sub(pos, nearest_s - 1) })
       end
       if found_delim_color then
-        table.insert(parts, { 
-          type = "delim", 
-          content = line:sub(nearest_s, nearest_e), 
-          color = found_delim_color 
-        })
+        table.insert(parts, { type = "delim", content = line:sub(nearest_s, nearest_e), color = found_delim_color })
       else
         table.insert(parts, { type = "token", content = found_token })
       end
