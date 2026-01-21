@@ -272,6 +272,32 @@ The usage is as follows:
 
 Additionally, the \KKverb|enabled| option functions the same as \KKverb|\KKvScanOn| and \KKverb|\KKvScanOff|.
 
+Also, you can change delimiters by using \KKverb|\KKvSetDelims| as follows in order to change the delimiters of the command:
+
+\KKvScanOff
+\begin{SourceCode}{Input}{TeX}
+  \KKvSetDelims{[<}{>]}
+
+  Changed the delimiters: \KKverb[<\def\foo\s>]
+\end{SourceCode}
+
+\KKvScanOn
+\begin{OutPut}{Output}
+\KKvSetDelims{[<}{>]}
+
+Changed the delimiters: \KKverb[<\def\foo\s>]
+\end{OutPut}
+
+\KKvSetDelims{|}{|}
+
+By default, the delimiters are set as "|". So you can reset them by this:
+
+\KKvScanOff
+\begin{SourceCode}{Input}{TeX}
+\KKvSetDelims{|}{|}
+\end{SourceCode}
+\KKvScanOn
+
 \subsection{Behavior in TOC, Index etc.}
 One of the strong points of \KKverb|\KKverb| is that it can be used in table of contents, index, and footnotes and more. 
 While the traditional \KKverb|\verb| command always causes an error in such contexts, \KKverb|\KKverb| does not. This is achieved through the following logic, using the TOC as an example.
@@ -555,7 +581,7 @@ By default, this package automatically replaces any spaces to Unicode character 
 
 \KKvScanOff
 \begin{SourceCode}{Input}{TeX}[Actual Use]
-  \KKvSetMap{ }{␣}
+  \KKvSetMap{ }{<sp>}
   \KKverb|  Look! All spaces are visualized!!  |
 
   \KKvSpaceForce
@@ -563,7 +589,7 @@ By default, this package automatically replaces any spaces to Unicode character 
 \end{SourceCode}
 \KKvScanOn
 \begin{OutPut}{Output}
-\KKvSetMap{ }{␣}
+\KKvSetMap{ }{<sp>}
 \KKverb|  Look! All spaces are visualized!!  |
 
 \KKvSpaceForce
