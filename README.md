@@ -18,3 +18,10 @@
 - **Support**: p.c.aces1056@gmail.com
 
 ---
+
+## Acknowledgements / Credits
+In devoloping this package, I made use of an algorithm which is used in "bxrawstr" (by Takayuki YATO).
+
+I recommend you to check his article. 
+
+- **Link**: [https://zrbabbler.hatenablog.com/entry/20181222/1545495849](https://zrbabbler.hatenablog.com/entry/20181222/1545495849)
