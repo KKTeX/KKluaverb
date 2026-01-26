@@ -8,8 +8,8 @@
 
 luatexbase.provides_module{
   name     = 'KKluaverb',
-  date     = '2026/01/20',
-  version  = '2.1.0',
+  date     = '2026/01/27',
+  version  = '2.1.1',
 }
 
 ----- for .sty interface -----
@@ -275,10 +275,18 @@ end
 
 
 ----- color changer -----
+local word_components_default = "[A-Za-z0-9_]" 
+  -- Define what consists a "word".
+  -- This can be changed by LaTeX UI.
+
 local function is_alnum(char)
   if not char then return false end
-  return char:match("[A-Za-z0-9_]") ~= nil
+  return char:match(word_components_default or options.word_components) ~= nil
 end
+-- この関数の検索対象を、
+-- TeX側から操作しに行けるようにする
+-- たとえば\を単語を構成する一部にしたい場合
+-- ここに\を入れる
 
 local function find_closing_delimiter(line, stop_char, start_pos, escape_char)
   local search_pos = start_pos
@@ -464,7 +472,7 @@ end
 KKV.presets = KKV.presets or {}
 
 function KKV.set_preset(name, map)
-    KKV.presets[name] = map
+  KKV.presets[name] = map
 end
 
 function KKV.load_preset(name)

@@ -34,7 +34,8 @@
       escape_char = "\\",
       delimiters = {
         { start = '$', stop = '$', color = "SpringGreen3" },
-      }       
+      },
+      word_components = "[A-Za-z0-9_\\]"   
     }
   }
 \end{luacode*}
@@ -72,10 +73,6 @@
 \begin{document}
 \KKvUsePreset{TeXStyle}
 
-\KKvSetMap{ }{␣}
-\KKverb|  Look! All spaces are visualized!!  |
-
-\KKvSpaceForce
-\KKverb|  Oh, spaces are no longer visualized.  |
+\KKverb|\ \def#1|
 
 \end{document}
