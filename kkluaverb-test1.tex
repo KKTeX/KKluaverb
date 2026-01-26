@@ -56,7 +56,7 @@
         "self" 
       },
 
-      DarkCyan = { "{", "}", "[", "]", "(", ")", "=", "+", "-", "*", "/", "#", "..", "==" }
+      DarkCyan = { "{", "}", "[", "]", "(", ")", "=", "+", "-", "*", "/", "#", "..", "==" , "\\"}
     },
     options = { 
       word_boundary = true,   
@@ -72,6 +72,10 @@
 
 \begin{document}
 \KKvUsePreset{TeXStyle}
+
+\KKverb|\ \def#1|
+
+\KKvUsePreset{LuaStyle}
 
 \KKverb|\ \def#1|
 

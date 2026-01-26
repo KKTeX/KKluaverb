@@ -283,10 +283,12 @@ local function is_alnum(char)
   if not char then return false end
   return char:match(word_components_default or options.word_components) ~= nil
 end
--- この関数の検索対象を、
--- TeX側から操作しに行けるようにする
--- たとえば\を単語を構成する一部にしたい場合
--- ここに\を入れる
+  -- If you want to set a certain character like "\" 
+  -- as a word component, use map-op:
+  -- 
+  -- options = { 
+  --     word_components = "[A-Za-z0-9_\\]"   
+  --   }
 
 local function find_closing_delimiter(line, stop_char, start_pos, escape_char)
   local search_pos = start_pos
@@ -322,6 +324,8 @@ function KKV.cut_multiple_tokens(line, targets, options)
   local delims = (options and options.delimiters) or {}
 
   local escape_char = (options and options.escape_char) or "\\"
+    -- Currently, the default escaper is "\".
+    -- Is this a proper choice...?
 
   local parts = {}
   local pos = 1
@@ -344,6 +348,16 @@ function KKV.cut_multiple_tokens(line, targets, options)
         end
       end
     end
+    -- To make sure that keywords in "delim" category are color-changed, 
+    -- I have to re-scan the delim part like this:
+    -- 1. When the system find a demil-pair, insert every text between them into "raw_delim" category.
+    -- 2. Serch for forced_keywords in the "raw_delim".
+    -- * forced_keywords means that this is completely different from the normal keywords and need to be set
+    --   in differnt part.
+    -- 3. Cut "raw_delim" like this:
+    --    $a + b = \frac{x}{y}$ (in this case, forced_keywords are "{" and "}".)
+    --    a + b = \frac → "plain_delim" colored by d_color (already exists)
+    --    { → "token_delim" colored by t_d_color (should be newly setted)
     
     for _, token in ipairs(targets) do
       local s, e = line:find(token, pos, true)
