@@ -222,6 +222,15 @@ In devoloping this package, I made use of an algorithm which is used in ``bxraws
 package: \url{https://gist.github.com/zr-tex8r/c7901658a866adfcd3cd66b6dfa86997}\par
 article: \url{https://zrbabbler.hatenablog.com/entry/20181222/1545495849}}.
 
+\section{Dependencies}
+This package internally uses the following packages:
+
+\begin{itemize}
+  \item luatexbase, luacode
+  \item pgfkeys
+  \item xcolor
+\end{itemize}
+
 \section{Basic Usage of Lua-enhanced \KKverb|\verb|}
 \subsection{Fundamental Behavior}
 As mentioned in the ``Outline'' section, this package mainly provides enhanced \KKverb|\verb| command. The usage is not much different from the normal one.
@@ -446,6 +455,7 @@ In order to set a colormap, you should use \verb|luacode*| environment as follow
       
       options = { 
         word_boundary = true or false,  
+        word_components = "[<word-components>]",
         comment_char = "<comment-token>",     
         comment_color = "<comment-color>", 
         escape_char = "<escape-token>",
@@ -456,8 +466,7 @@ In order to set a colormap, you should use \verb|luacode*| environment as follow
         forced_tokens = {
           ["<forced-token1>"] = "<color2>",
           ["<forced-token2>"] = "<color2>",
-        },
-        word_components = "[<word-components>]"       
+        }
       }
     }
   \end{luacode*}
@@ -466,17 +475,44 @@ In order to set a colormap, you should use \verb|luacode*| environment as follow
 %%% オプション全部についてガッツリ説明書くこと！
 %%% 今のままだとわかりづらい！
 
+The ``color'' parameter here refers to those defined in the \verb|xcolor| package.
+
 You can set multiple presets, and can change or activate by \verb|\KKvUsePreset{<name-of-style>}| command. 
 
-\KKvScanOn\KKvUsePreset{LuaStyle}
-\subsection{The \KKverb|word_boundary| Option}
-The option controls how the scanner identifies the limits of a keyword during the tokenization process. 
-It determines whether a sequence of characters should be treated as a standalone keyword or as part of a larger string.
+\KKvScanOn
+\subsubsection{\KKverb|word_boundary, word_components| options}
+\KKvScanOff
+These two options are closely related to each other. In the argument of the \verb|\KKverb| command or inside of the \verb|\KKcodeS/E| environment,
+\KKvScanOn\KKvUsePreset{TeXStyle}
+the mapped keywords are colored as you specified. However, if the string is included in the other words, you need to prevent the system provided from wrongly color the string. For example, in the situation that \KKverb|\def| command is mapped as a keyword but \KKverb|\define| is not, the part of \KKverb|\def| in \KKverb|\define| should not be colored.
 
-\begin{description}
-  \item[When Disabled: \KKverb|false|] The scanner performs a raw string search. Any occurrence of the target token is highlighted, regardless of its surrounding characters. For example, if the keyword is \KKverb|if|, it will be highlighted even inside the word \KKverb|different|. 
-  \item[When Enabled (Default): \KKverb|true|] \KKvUsePreset{TeXStyle}This mode prevents unintended partial matching. It ensures that a keyword is highlighted only when it stands as a complete word. Crucially, symbols (such as \texttt{(}, \texttt{[}, \texttt{\#}, etc.) are automatically treated as boundaries. For example, \KKverb|\def#1| will result in \KKverb|\def| being highlighted, whereas the \KKvUsePreset{LuaStyle}\KKverb|if| inside \KKverb|different| will remain plain text.
-\end{description}
+For this purpose, I made a ``\KKverb|word_boundary| detector''. In advance, set the components of the ``word'' like this:
+
+\KKvUsePreset{LuaStyle}
+\KKcodeS+
+word_components = "[A-Za-z0-9_]",
+\KKcodeE
+
+Then, activate the \KKverb|word_boundary| detector:
+
+\KKcodeS+
+word_boundary = true,  
+\KKcodeE
+
+By all this, any characters or tokens except for \KKverb|"[A-Za-z0-9_]"| works as a separater of the words or tokens, and each keywords are properly colored.
+
+By default, \KKverb|word_boundary| are set as ``\KKverb|true|'', and \KKverb|word_components| are set as \KKverb|"[A-Za-z0-9_]"|.
+
+\subsubsection{\KKverb|comment_char, comment_color, escape_char| options}
+These options are provided in order to set comment character, comment color, and escape character respectively.
+
+If you set \KKverb|comment_char|,
+the following texts in the same lina are colored as \KKverb|comment_color|.
+But, if you put the \KKverb|escape_char| before the \KKverb|comment_char|, the very token and the following texts are not colored as \KKverb|comment_color|.
+
+\subsubsection{\KKverb|delimiters, forced_token| options}
+These options are provided for the purpose of setting \KKverb|delimiter token| and the color of the texts between the tokens.
+Additionally, you can set multiple \KKverb|forced_token|. These are forced to be colored as you specify, even they are between the delimiters.
 
 \subsection{Example}
 \KKvScanOff
@@ -534,7 +570,6 @@ It determines whether a sequence of characters should be treated as a standalone
   \KKvUsePreset{TeXStyle} 
 
   \KKcodeS+
-  \usepackage{xcolor}
   \usepackage{KKluaverb}
 
   \begin{document}
@@ -555,7 +590,6 @@ It determines whether a sequence of characters should be treated as a standalone
 \KKvUsePreset{TeXStyle} 
 
 \KKcodeS+
-\usepackage{xcolor}
 \usepackage{KKluaverb}
 
 \begin{document}
