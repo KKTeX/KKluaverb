@@ -275,14 +275,12 @@ end
 
 
 ----- color changer -----
-local word_components_default = "[A-Za-z0-9_]" 
-  -- Define what consists a "word".
-  -- This can be changed by LaTeX UI.
-
-local function is_alnum(char)
-  if not char then return false end
-  return char:match(word_components_default or options.word_components) ~= nil
+local function is_alnum(char, options)
+  if not char or char == "" then return false end
+  local p = options.word_components or "[A-Za-z0-9_]"
+  return char:match(p) ~= nil
 end
+-- Enhancement in v2.1.1
   -- If you want to set a certain character like "\" 
   -- as a word component, use map-op:
   -- 
@@ -415,10 +413,10 @@ function KKV.cut_multiple_tokens(line, targets, options)
           local next_char = e < #line and line:sub(e+1, e+1) or nil
           
           -- Check the tokens.
-          if is_alnum(token:sub(1, 1)) and is_alnum(prev_char) then
+          if is_alnum(token:sub(1, 1), options) and is_alnum(prev_char, options) then
             is_valid = false
           end
-          if is_alnum(token:sub(-1, -1)) and is_alnum(next_char) then
+          if is_alnum(token:sub(-1, -1), options) and is_alnum(next_char, options) then
             is_valid = false
           end
         end

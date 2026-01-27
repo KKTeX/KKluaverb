@@ -66,8 +66,13 @@
       comment_color = "ForestGreen", 
       escape_char = "\\",
       delimiters = {
-        { start = '$', stop = '$', color = "SpringGreen3" },
-      }         
+        { start = "$", stop = "$", color = "SpringGreen3" },
+        { start = "\\[", stop = "\\]", color = "SpringGreen3" },
+      },
+      forced_tokens = {
+        ["{"] = "DarkCyan",
+        ["}"] = "DarkCyan",
+      },
     }
   }
 \end{luacode*}
@@ -194,7 +199,7 @@ fonttitle=\ascb@gtfamily, IfValueTF={#1}{title=\hspace*{.1em}【#2】〈#1〉\hs
 %%% titlepage
 \title{\texttt{KKluaverb} Package Documentation}
 \author{Kosei Kawaguchi a.k.a. KKTeX}
-\date{Version 2.1.0 (2026/01/20)}
+\date{Version 2.1.2 (2026/01/27)}
 %%%
 
 \begin{document}
@@ -445,12 +450,21 @@ In order to set a colormap, you should use \verb|luacode*| environment as follow
         comment_color = "<comment-color>", 
         escape_char = "<escape-token>",
         delimiters = {
-          { start = '<starter>', stop = '<ender>', color = "<patial-color>" },
-        }       
+          { start = '<starter1>', stop = '<ender1>', color = "<patial-color1>" },
+          { start = '<starter2>', stop = '<ender2>', color = "<patial-color2>" },
+        },
+        forced_tokens = {
+          ["<forced-token1>"] = "<color2>",
+          ["<forced-token2>"] = "<color2>",
+        },
+        word_components = "[<word-components>]"       
       }
     }
   \end{luacode*}
 \end{SourceCode}
+
+%%% オプション全部についてガッツリ説明書くこと！
+%%% 今のままだとわかりづらい！
 
 You can set multiple presets, and can change or activate by \verb|\KKvUsePreset{<name-of-style>}| command. 
 
@@ -474,7 +488,7 @@ It determines whether a sequence of characters should be treated as a standalone
         DarkCyan = { "{", "}" },              
         OrangeRed = { "[", "]" },
         DeepPink = { "(", ")" },              
-        DarkGoldenrod = { "&", "$", "^", "_" },
+        DarkGoldenrod = { "&", "$", "^", "_", "\\"},
 
         CornflowerBlue = { 
           "\\documentclass", "\\usepackage", "\\begin", "\\end", 
@@ -504,8 +518,13 @@ It determines whether a sequence of characters should be treated as a standalone
         comment_color = "ForestGreen", 
         escape_char = "\\",
         delimiters = {
-        { start = '$', stop = '$', color = "SpringGreen3" },
-      }        
+          { start = "$", stop = "$", color = "SpringGreen3" },
+          { start = "\\[", stop = "\\]", color = "SpringGreen3" },
+        },
+        forced_tokens = {
+          ["{"] = "DarkCyan",
+          ["}"] = "DarkCyan",
+        },
       }
     }
   \end{luacode*}
@@ -525,6 +544,9 @@ It determines whether a sequence of characters should be treated as a standalone
 
   \KKcodeS
   { [ \ ( \% \$ # & _ ^ ) / ] }
+  Inline mathmode: $a + b = \frac{x}{y}$
+  Display-style mathmode: 
+  \[a + b = \frac{x}{y}\]
   \KKcodeE
 \end{SourceCode}
 
@@ -543,7 +565,9 @@ It determines whether a sequence of characters should be treated as a standalone
 
 \KKcodeS
 { [ \ ( \% \$ # & _ ^ ) / ] }
-$x = a + \frac{b}{c}$
+Inline mathmode: $a + b = \frac{x}{y}$
+Display-style mathmode: 
+\[a + b = \frac{x}{y}\]
 \KKcodeE
 \end{OutPut}
 

@@ -7,7 +7,7 @@
       DarkCyan = { "{", "}" },              
       OrangeRed = { "[", "]" },
       DeepPink = { "(", ")" },              
-      DarkGoldenrod = { "&", "$", "^", "_", " \\ "},
+      DarkGoldenrod = { "&", "$", "^", "_"},
 
       CornflowerBlue = { 
         "\\documentclass", "\\usepackage", "\\begin", "\\end", 
@@ -33,14 +33,13 @@
       comment_color = "ForestGreen", 
       escape_char = "\\",
       delimiters = {
-        { start = '$', stop = '$', color = "SpringGreen3" },
-        { start = '"', stop = '"', color = "SkyBlue1" },
+        { start = "$", stop = "$", color = "SpringGreen3" },
+        { start = "\\[", stop = "\\]", color = "SpringGreen3" },
       },
       forced_tokens = {
-        ["{"] = "red",
-        ["}"] = "red",
+        ["{"] = "DarkCyan",
+        ["}"] = "DarkCyan",
       },
-      word_components = "[A-Za-z0-9_\\]"   
     }
   }
 \end{luacode*}
@@ -78,6 +77,8 @@
 \begin{document}
 \KKvUsePreset{TeXStyle}
 
-\KKverb|あああ$a+b{fff}$いいい"XX{あああ}XX"ううう|
+\KKverb|あああ$a+b{fff}$いいい\[aaa{bbb}ccc\]うう\AAA う\define|
+
+
 
 \end{document}
