@@ -34,6 +34,11 @@
       escape_char = "\\",
       delimiters = {
         { start = '$', stop = '$', color = "SpringGreen3" },
+        { start = '"', stop = '"', color = "SkyBlue1" },
+      },
+      forced_tokens = {
+        ["{"] = "red",
+        ["}"] = "red",
       },
       word_components = "[A-Za-z0-9_\\]"   
     }
@@ -73,10 +78,6 @@
 \begin{document}
 \KKvUsePreset{TeXStyle}
 
-\KKverb|\ \def#1|
-
-\KKvUsePreset{LuaStyle}
-
-\KKverb|\ \def#1|
+\KKverb|あああ$a+b{fff}$いいい"XX{あああ}XX"ううう|
 
 \end{document}

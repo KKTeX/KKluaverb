@@ -9,7 +9,7 @@
 luatexbase.provides_module{
   name     = 'KKluaverb',
   date     = '2026/01/27',
-  version  = '2.1.1',
+  version  = '2.1.2',
 }
 
 ----- for .sty interface -----
@@ -315,6 +315,47 @@ local function find_closing_delimiter(line, stop_char, start_pos, escape_char)
   end
 end
 
+
+local function parse_inside_delim(content, forced_tokens, base_color)
+  -- Only used in "delim" part
+
+  if not forced_tokens or type(forced_tokens) ~= "table" or not next(forced_tokens) then
+    return {{ type = "delim", content = content, color = base_color }}
+  end
+
+  local res = {}
+  local pos = 1
+  
+  local keys = {}
+  for k in pairs(forced_tokens) do table.insert(keys, k) end
+
+  while pos <= #content do
+    local nearest_s, nearest_e, found_k
+    
+    for _, k in ipairs(keys) do
+      local s, e = content:find(k, pos, true)
+      if s and (not nearest_s or s < nearest_s) then
+        nearest_s, nearest_e, found_k = s, e, k
+      end
+    end
+
+    if nearest_s then
+      if nearest_s > pos then
+        table.insert(res, { type = "delim_plain", content = content:sub(pos, nearest_s - 1), color = base_color })
+      end
+      -- forced
+      table.insert(res, { type = "token_delim", content = found_k, color = forced_tokens[found_k] })
+      pos = nearest_e + 1
+    else
+      -- plain
+      table.insert(res, { type = "delim_plain", content = content:sub(pos), color = base_color })
+      break
+    end
+  end
+  
+  return res
+end
+
 function KKV.cut_multiple_tokens(line, targets, options)
   local use_boundary = true
   if options and options.word_boundary ~= nil then
@@ -322,6 +363,9 @@ function KKV.cut_multiple_tokens(line, targets, options)
   end
   
   local delims = (options and options.delimiters) or {}
+    -- unique delimiters
+  local forced = (options and options.forced_tokens) or {}
+    -- forced to change color even in delims
 
   local escape_char = (options and options.escape_char) or "\\"
     -- Currently, the default escaper is "\".
@@ -348,6 +392,7 @@ function KKV.cut_multiple_tokens(line, targets, options)
         end
       end
     end
+    -- Enhancement in v2.1.2
     -- To make sure that keywords in "delim" category are color-changed, 
     -- I have to re-scan the delim part like this:
     -- 1. When the system find a demil-pair, insert every text between them into "raw_delim" category.
@@ -356,8 +401,8 @@ function KKV.cut_multiple_tokens(line, targets, options)
     --   in differnt part.
     -- 3. Cut "raw_delim" like this:
     --    $a + b = \frac{x}{y}$ (in this case, forced_keywords are "{" and "}".)
-    --    a + b = \frac → "plain_delim" colored by d_color (already exists)
-    --    { → "token_delim" colored by t_d_color (should be newly setted)
+    --    a + b = \frac → "plain_delim" colored by d_color 
+    --    { → "token_delim" colored by t_d_color
     
     for _, token in ipairs(targets) do
       local s, e = line:find(token, pos, true)
@@ -392,7 +437,15 @@ function KKV.cut_multiple_tokens(line, targets, options)
         table.insert(parts, { type = "plain", content = line:sub(pos, nearest_s - 1) })
       end
       if found_delim_color then
-        table.insert(parts, { type = "delim", content = line:sub(nearest_s, nearest_e), color = found_delim_color })
+        -- table.insert(parts, { type = "delim", content = line:sub(nearest_s, nearest_e), color = found_delim_color })
+
+        -- Enhancement in v2.1.2
+        -- Re-process "delim" part in order to search for forced_tokens.
+        local delim_raw = line:sub(nearest_s, nearest_e)
+        local sub_parts = parse_inside_delim(delim_raw, forced, found_delim_color)
+        for _, sp in ipairs(sub_parts) do
+          table.insert(parts, sp)
+        end
       else
         table.insert(parts, { type = "token", content = found_token })
       end
@@ -462,9 +515,24 @@ function KKV.output_with_multiple_colors(line, color_map, allow_comments)
       tex.sprint("\\textcolor{" .. t_color .. "}{")
       tex.sprint(-2, p.content)
       tex.sprint("}")
-    elseif p.type == "delim" then
+    -- elseif p.type == "delim" then
+    --   local d_color = p.color or "black"
+    --   tex.sprint("\\textcolor{" .. d_color .. "}{")
+    --   tex.sprint(-2, p.content)
+    --   tex.sprint("}")
+
+    -- Enhancement in v2.1.2
+    elseif p.type == "delim" or p.type == "delim_plain" then
+      -- デリミタ全体、またはデリミタ内の「地の文」
       local d_color = p.color or "black"
       tex.sprint("\\textcolor{" .. d_color .. "}{")
+      tex.sprint(-2, p.content)
+      tex.sprint("}")
+
+    elseif p.type == "token_delim" then
+      -- デリミタ内部で特別に指定されたキーワード
+      local td_color = p.color or "black"
+      tex.sprint("\\textcolor{" .. td_color .. "}{")
       tex.sprint(-2, p.content)
       tex.sprint("}")
     else
