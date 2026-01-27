@@ -284,9 +284,9 @@ end
   -- If you want to set a certain character like "\" 
   -- as a word component, use map-op:
   -- 
-  -- options = { 
-  --     word_components = "[A-Za-z0-9_\\]"   
-  --   }
+  --  options = { 
+  --    word_components = "[A-Za-z0-9_\\]"   
+  --  }
 
 local function find_closing_delimiter(line, stop_char, start_pos, escape_char)
   local search_pos = start_pos
@@ -521,14 +521,12 @@ function KKV.output_with_multiple_colors(line, color_map, allow_comments)
 
     -- Enhancement in v2.1.2
     elseif p.type == "delim" or p.type == "delim_plain" then
-      -- デリミタ全体、またはデリミタ内の「地の文」
       local d_color = p.color or "black"
       tex.sprint("\\textcolor{" .. d_color .. "}{")
       tex.sprint(-2, p.content)
       tex.sprint("}")
 
     elseif p.type == "token_delim" then
-      -- デリミタ内部で特別に指定されたキーワード
       local td_color = p.color or "black"
       tex.sprint("\\textcolor{" .. td_color .. "}{")
       tex.sprint(-2, p.content)
