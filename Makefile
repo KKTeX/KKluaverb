@@ -7,23 +7,25 @@ RC     = .latexmkrc
 
 
 # ----- main ------
-.PHONY: clean distclean pvc zip builddoc buildtest
+.PHONY: 
+	clean distclean pvc zip doc 
+	test1 test2 smaple
 
 # compile
-builddoc:
+doc:
 	latexmk -r $(RC) $(DOC_TARGET).tex
 	$(MAKE) clean
 
-buildsample:
+sample:
 	latexmk -r $(RC) $(SAMPLE_TARGET).tex
 	$(MAKE) clean
 
-buildtest1:
+test1:
 # 	$(MAKE) distclean
 	latexmk -r $(RC) $(TEST1_TARGET).tex
 	$(MAKE) clean
 
-buildtest2:
+test2:
 # 	$(MAKE) distclean
 	latexmk -r $(RC) $(TEST2_TARGET).tex
 	$(MAKE) clean
