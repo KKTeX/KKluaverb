@@ -8,8 +8,8 @@
 
 luatexbase.provides_module{
   name     = 'KKluaverb',
-  date     = '2026/06/11',
-  version  = '2.2.0',
+  date     = '2026/06/12',
+  version  = '2.3.0',
 }
 
 ----- for .sty interface -----
@@ -31,6 +31,7 @@ local DEFAULT_STARTER_flag1 = "\\KKcodeS"
 local DEFAULT_TERMINATOR_flag1   = "\\KKcodeE"
 
 KKV.code_escape_char = "\\"
+KKV.wrap = false
   -- Inside \KKcodeS...\KKcodeE, this character placed
   -- immediately before \KKcodeE makes it a literal text
   -- instead of the terminator.
@@ -79,15 +80,73 @@ end
 KKV.replacements = {}
 
 function KKV.add_replacement(from_char, to_char)
+  -- When overwriting, clean up any tex_map entry for the old marker.
+  local old = KKV.replacements[from_char]
+  if old and KKV.tex_map[old] then
+    KKV.tex_map[old] = nil
+  end
   KKV.replacements[from_char] = to_char
 end
 
 KKV.add_replacement(" ", "\194\160")
   -- Avoid ignoring space.
+
+-- Enhancement in v2.2.x
+-- Map a character to a TeX command (e.g. " " -> \textvisiblespace).
+-- Internally, an unused control byte (0x01-0x1F) is used as a marker:
+-- the replacer turns <from_char> into the marker, and the output
+-- routine emits <tex_cmd> (with expansion) whenever it meets the marker.
+KKV.tex_map = {}
+
+function KKV.add_tex_map_from(from_char, tex_cmd)
+  -- Find an unused control byte to serve as the marker.
+  local marker
+  for b = 1, 31 do
+    local c = string.char(b)
+    if KKV.tex_map[c] == nil then
+      marker = c
+      break
+    end
+  end
+  if not marker then
+    texio.write_nl(
+      "Package KKluaverb Warning: no free internal marker left "
+      .. "(max 31 TeX mappings); mapping ignored.")
+    return
+  end
+  KKV.tex_map[marker] = tex_cmd
+  KKV.add_replacement(from_char, marker)
+end
+
+function KKV.clear_tex_map_for(from_char)
+  -- Remove the tex_map entry for from_char and restore its default replacement.
+  -- For space, the default is NBSP; for other chars, the mapping is simply removed.
+  local marker = KKV.replacements[from_char]
+  if marker and KKV.tex_map[marker] then
+    KKV.tex_map[marker] = nil
+    if from_char == " " then
+      KKV.replacements[from_char] = "\194\160"
+    else
+      KKV.replacements[from_char] = nil
+    end
+  end
+end
 ----------
 
 
 ----- decode -----
+local function count_leading_nbsp(s)
+  -- Returns (count, first_non_nbsp_byte_pos).
+  -- NBSP = U+00A0 = UTF-8: 0xC2 0xA0
+  local n, i = 0, 1
+  while i + 1 <= #s do
+    if s:byte(i) == 0xC2 and s:byte(i + 1) == 0xA0 then
+      n = n + 1; i = i + 2
+    else break end
+  end
+  return n, i
+end
+
 function KKV.decode(rstr)
   local chex = function(s) return utf8.char(tonumber(s, 16)) end
   local decoded = rstr
@@ -102,7 +161,21 @@ function KKV.decode(rstr)
 
   -- How to process linebreak
   local lb_flag = tex.gettoks("kklv@linebreak")
-  
+
+  -- Character width for wrap hangindent (measured from current \ttfamily font)
+  local char_width_sp, wrap_indent_sp = 0, 0
+  if KKLuaVerb.wrap then
+    local f = font.getfont(font.current())
+    if f and f.characters then
+      local c = f.characters[48] or f.characters[65] or f.characters[120]
+      char_width_sp = (c and c.width) or 0
+    end
+    if char_width_sp == 0 and f and f.parameters then
+      char_width_sp = f.parameters[2] or 0
+    end
+    wrap_indent_sp = tex.getdimen("kklv@wrap@indent")
+  end
+
   -- If lb_flag is "1",
   -- a "verbatim paragraph" is produced.
   -- Behave like an environment.
@@ -117,17 +190,43 @@ function KKV.decode(rstr)
     local last_idx = #dc_lines
     last_idx = last_idx - 1
       -- Delete the last line.
-    tex.sprint("\\par\\noindent")
-    for i = 2, last_idx do -- ref: NOTE#1
-      local content = dc_lines[i]
-      if content ~= "" then
-        local map_to_use = KKV.active_map or {}
-        KKV.output_with_multiple_colors(content, map_to_use, true)
-      end
-      if i < last_idx then
-        tex.sprint("\\hfill\\break\\noindent")
-      else
+
+    if KKLuaVerb.wrap then
+      -- Each logical line becomes its own paragraph so \hangindent applies per-line.
+      -- \parskip0pt suppresses inter-paragraph spacing within the block.
+      tex.sprint("\\par{\\parskip0pt\\relax")
+      for i = 2, last_idx do -- ref: NOTE#1
+        local content = dc_lines[i]
+        local hangindent_sp = wrap_indent_sp
+        if content ~= "" then
+          local leading_n, rest_pos = count_leading_nbsp(content)
+          -- Keep leading NBSP (indentation); replace remaining NBSP with breakable spaces.
+          local leading_bytes = content:sub(1, rest_pos - 1)
+          local rest = content:sub(rest_pos):gsub("\194\160", " ")
+          content = leading_bytes .. rest
+          hangindent_sp = leading_n * char_width_sp + wrap_indent_sp
+        end
+        tex.sprint("\\noindent\\hangafter1\\hangindent=" .. hangindent_sp .. "sp ")
+        if content ~= "" then
+          local map_to_use = KKV.active_map or {}
+          KKV.output_with_multiple_colors(content, map_to_use, true)
+        end
         tex.sprint("\\hspace*{\\fill}\\par")
+      end
+      tex.sprint("}")
+    else
+      tex.sprint("\\par\\noindent")
+      for i = 2, last_idx do -- ref: NOTE#1
+        local content = dc_lines[i]
+        if content ~= "" then
+          local map_to_use = KKV.active_map or {}
+          KKV.output_with_multiple_colors(content, map_to_use, true)
+        end
+        if i < last_idx then
+          tex.sprint("\\hfill\\break\\noindent")
+        else
+          tex.sprint("\\hspace*{\\fill}\\par")
+        end
       end
     end
 
@@ -146,18 +245,42 @@ function KKV.decode(rstr)
     local last_idx = #dc_lines
     last_idx = last_idx - 1
       -- Delete the last line.
-    tex.sprint("\\par\\noindent")
-    for i = 2, last_idx do -- ref: NOTE#1
-      tex.sprint("\\KKlvLineNumber{" .. (i - 1 + fl_linenumber) .. "}")
-      local content = dc_lines[i]
-      if content ~= "" then
-        local map_to_use = KKV.active_map or {}
-        KKV.output_with_multiple_colors(content, map_to_use, true)
-      end
-      if i < last_idx then
-        tex.sprint("\\hfill\\break\\noindent")
-      else
+
+    if KKLuaVerb.wrap then
+      tex.sprint("\\par{\\parskip0pt\\relax")
+      for i = 2, last_idx do -- ref: NOTE#1
+        local content = dc_lines[i]
+        local hangindent_sp = wrap_indent_sp
+        if content ~= "" then
+          local leading_n, rest_pos = count_leading_nbsp(content)
+          local leading_bytes = content:sub(1, rest_pos - 1)
+          local rest = content:sub(rest_pos):gsub("\194\160", " ")
+          content = leading_bytes .. rest
+          hangindent_sp = leading_n * char_width_sp + wrap_indent_sp
+        end
+        tex.sprint("\\noindent\\hangafter1\\hangindent=" .. hangindent_sp .. "sp ")
+        tex.sprint("\\KKlvLineNumber{" .. (i - 1 + fl_linenumber) .. "}")
+        if content ~= "" then
+          local map_to_use = KKV.active_map or {}
+          KKV.output_with_multiple_colors(content, map_to_use, true)
+        end
         tex.sprint("\\hspace*{\\fill}\\par")
+      end
+      tex.sprint("}")
+    else
+      tex.sprint("\\par\\noindent")
+      for i = 2, last_idx do -- ref: NOTE#1
+        tex.sprint("\\KKlvLineNumber{" .. (i - 1 + fl_linenumber) .. "}")
+        local content = dc_lines[i]
+        if content ~= "" then
+          local map_to_use = KKV.active_map or {}
+          KKV.output_with_multiple_colors(content, map_to_use, true)
+        end
+        if i < last_idx then
+          tex.sprint("\\hfill\\break\\noindent")
+        else
+          tex.sprint("\\hspace*{\\fill}\\par")
+        end
       end
     end
 
@@ -309,6 +432,38 @@ end
 
 
 ----- color changer -----
+-- Enhancement in v2.2.x
+-- Print verbatim content, but expand registered TeX mappings:
+-- segments are printed with catcode-12 (-2), while marker bytes
+-- are replaced by their TeX command (printed with expansion).
+local function sprint_tex_mapped(content)
+  if next(KKV.tex_map) == nil then
+    tex.sprint(-2, content)
+    return
+  end
+  local pos = 1
+  while true do
+    local s = content:find("[\1-\31]", pos)
+    if not s then
+      if pos <= #content then
+        tex.sprint(-2, content:sub(pos))
+      end
+      break
+    end
+    if s > pos then
+      tex.sprint(-2, content:sub(pos, s - 1))
+    end
+    local cmd = KKV.tex_map[content:sub(s, s)]
+    if cmd then
+      tex.sprint(cmd)
+    else
+      -- Unregistered control byte: keep it as-is.
+      tex.sprint(-2, content:sub(s, s))
+    end
+    pos = s + 1
+  end
+end
+
 local function is_alnum(char, options)
   if not char or char == "" then return false end
   local p = options.word_components or "[A-Za-z0-9_]"
@@ -543,9 +698,9 @@ function KKV.output_with_multiple_colors(line, color_map, allow_comments)
 
   for _, p in ipairs(parts) do
     if p.type == "token" then
-      local t_color = token_to_color[p.content] or "black" 
+      local t_color = token_to_color[p.content] or "black"
       tex.sprint("\\textcolor{" .. t_color .. "}{")
-      tex.sprint(-2, p.content)
+      sprint_tex_mapped(p.content)
       tex.sprint("}")
     -- elseif p.type == "delim" then
     --   local d_color = p.color or "black"
@@ -557,23 +712,23 @@ function KKV.output_with_multiple_colors(line, color_map, allow_comments)
     elseif p.type == "delim" or p.type == "delim_plain" then
       local d_color = p.color or "black"
       tex.sprint("\\textcolor{" .. d_color .. "}{")
-      tex.sprint(-2, p.content)
+      sprint_tex_mapped(p.content)
       tex.sprint("}")
 
     elseif p.type == "token_delim" then
       local td_color = p.color or "black"
       tex.sprint("\\textcolor{" .. td_color .. "}{")
-      tex.sprint(-2, p.content)
+      sprint_tex_mapped(p.content)
       tex.sprint("}")
     else
-      tex.sprint(-2, p.content)
+      sprint_tex_mapped(p.content)
     end
   end
 
   if comment_part ~= "" then
     local c_color = options.comment_color or "gray"
     tex.sprint("\\textcolor{" .. c_color .. "}{")
-    tex.sprint(-2, comment_part)
+    sprint_tex_mapped(comment_part)
     tex.sprint("}")
   end
 end

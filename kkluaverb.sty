@@ -10,7 +10,7 @@
 % Commands for system: KKlv-
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{KKluaverb}[2026/06/11 v2.2.0]
+\ProvidesPackage{KKluaverb}[2026/06/12 v2.3.0]
 
 %%% package
 \RequirePackage{luatexbase, luacode}
@@ -27,9 +27,12 @@
   enabled/.code = {%
     \directlua{KKLuaVerb.enabled = #1}%
   },
+  wrap/.code     = {\directlua{KKLuaVerb.wrap = (#1)}},
+  wrapindent/.code = {\kklv@wrap@indent=#1},
 }
 \newcommand{\KKvOpChange}[1]{\pgfkeys{/kklv/.cd, #1}}
-\KKvOpChange{font=\ttfamily, color=black, enabled=true}
+\newdimen\kklv@wrap@indent
+\KKvOpChange{font=\ttfamily, color=black, enabled=true, wrap=false, wrapindent=2em}
 \newcommand{\KKvScanOn}{\KKvOpChange{enabled=true}}
 \newcommand{\KKvScanOff}{\KKvOpChange{enabled=false}}
 %%%
@@ -98,6 +101,28 @@
   \directlua{
     KKLuaVerb.add_replacement(" ", string.char(194, 160))
   }%
+}
+
+% Map a character to a TeX command in verbatim output.
+% e.g. \KKvSetMapTeX{ }{\textvisiblespace}
+\newcommand{\KKvSetMapTeX}[2]{%
+  \directlua{
+    KKLuaVerb.add_tex_map_from(\kklv@lua@str{#1}, \kklv@lua@str{#2})
+  }%
+}
+
+% Convenience: show spaces as half-width visible spaces
+% (\textvisiblespace), unlike \KKvSetMap{ }{<U+2423>} which
+% produces a full-width Japanese glyph.
+\newcommand{\KKvSpaceVisible}{%
+  \KKvSetMapTeX{ }{\textvisiblespace}%
+}
+
+% Remove the TeX-command mapping for a character, restoring default behaviour.
+% For space: reverts to NBSP (same as \KKvSpaceForce).
+% Usage: \KKvClearMapTeX{ }
+\newcommand{\KKvClearMapTeX}[1]{%
+  \directlua{KKLuaVerb.clear_tex_map_for(\kklv@lua@str{#1})}%
 }
 
 % Escape character for a literal \KKcodeE

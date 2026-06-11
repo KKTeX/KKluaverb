@@ -1,0 +1,30 @@
+\documentclass{ltjsarticle}
+\usepackage[margin=20mm]{geometry}
+\usepackage{KKluaverb}
+
+\begin{document}
+
+\section*{\texttt{\textbackslash KKvSetMap\{ \}\{␣\}}: full-width (before)}
+\KKvSetMap{ }{␣}
+\KKverb|Hello World test|
+
+\section*{\texttt{\textbackslash KKvSpaceVisible}: half-width (on)}
+\KKvSpaceVisible
+\KKverb|Hello World test|
+
+\section*{\texttt{\textbackslash KKvClearMapTeX\{ \}}: back to NBSP (off)}
+\KKvClearMapTeX{ }
+\KKverb|Hello World test|
+
+\section*{\texttt{\textbackslash KKvSpaceVisible} on again}
+\KKvSpaceVisible
+\KKcodeS
+line with spaces here
+  indented line
+\KKcodeE
+
+\section*{\texttt{\textbackslash KKvSetMap} overwrites (also clears tex\_map)}
+\KKvSetMap{ }{X}
+\KKverb|Hello World test|
+
+\end{document}
