@@ -1,0 +1,22 @@
+\documentclass{ltjsarticle}
+\usepackage[margin=20mm]{geometry}
+\usepackage{KKluaverb}
+
+\begin{document}
+
+\section*{Before: \texttt{\textbackslash KKvSetMap\{ \}\{␣\}} (full-width)}
+\KKvSetMap{ }{␣}
+\KKverb|Hello World test|
+
+\section*{After: \texttt{\textbackslash KKvSpaceVisible} (half-width)}
+\KKvSpaceVisible
+\KKverb|Hello World test|
+
+\section*{\texttt{\textbackslash KKvSetMapTeX} general}
+\KKvSetMapTeX{ }{\textvisiblespace}
+\KKcodeS
+line with spaces here
+  indented line
+\KKcodeE
+
+\end{document}

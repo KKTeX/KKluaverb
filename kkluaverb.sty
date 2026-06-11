@@ -103,6 +103,21 @@
   }%
 }
 
+% Map a character to a TeX command in verbatim output.
+% e.g. \KKvSetMapTeX{ }{\textvisiblespace}
+\newcommand{\KKvSetMapTeX}[2]{%
+  \directlua{
+    KKLuaVerb.add_tex_map_from(\kklv@lua@str{#1}, \kklv@lua@str{#2})
+  }%
+}
+
+% Convenience: show spaces as half-width visible spaces
+% (\textvisiblespace), unlike \KKvSetMap{ }{<U+2423>} which
+% produces a full-width Japanese glyph.
+\newcommand{\KKvSpaceVisible}{%
+  \KKvSetMapTeX{ }{\textvisiblespace}%
+}
+
 % Escape character for a literal \KKcodeE
 % inside the \KKcodeS/E environment.
 \newcommand{\KKvSetCodeEscape}[1]{%

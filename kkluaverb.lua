@@ -85,6 +85,33 @@ end
 
 KKV.add_replacement(" ", "\194\160")
   -- Avoid ignoring space.
+
+-- Enhancement in v2.2.x
+-- Map a character to a TeX command (e.g. " " -> \textvisiblespace).
+-- Internally, an unused control byte (0x01-0x1F) is used as a marker:
+-- the replacer turns <from_char> into the marker, and the output
+-- routine emits <tex_cmd> (with expansion) whenever it meets the marker.
+KKV.tex_map = {}
+
+function KKV.add_tex_map_from(from_char, tex_cmd)
+  -- Find an unused control byte to serve as the marker.
+  local marker
+  for b = 1, 31 do
+    local c = string.char(b)
+    if KKV.tex_map[c] == nil then
+      marker = c
+      break
+    end
+  end
+  if not marker then
+    texio.write_nl(
+      "Package KKluaverb Warning: no free internal marker left "
+      .. "(max 31 TeX mappings); mapping ignored.")
+    return
+  end
+  KKV.tex_map[marker] = tex_cmd
+  KKV.add_replacement(from_char, marker)
+end
 ----------
 
 
@@ -386,6 +413,38 @@ end
 
 
 ----- color changer -----
+-- Enhancement in v2.2.x
+-- Print verbatim content, but expand registered TeX mappings:
+-- segments are printed with catcode-12 (-2), while marker bytes
+-- are replaced by their TeX command (printed with expansion).
+local function sprint_tex_mapped(content)
+  if next(KKV.tex_map) == nil then
+    tex.sprint(-2, content)
+    return
+  end
+  local pos = 1
+  while true do
+    local s = content:find("[\1-\31]", pos)
+    if not s then
+      if pos <= #content then
+        tex.sprint(-2, content:sub(pos))
+      end
+      break
+    end
+    if s > pos then
+      tex.sprint(-2, content:sub(pos, s - 1))
+    end
+    local cmd = KKV.tex_map[content:sub(s, s)]
+    if cmd then
+      tex.sprint(cmd)
+    else
+      -- Unregistered control byte: keep it as-is.
+      tex.sprint(-2, content:sub(s, s))
+    end
+    pos = s + 1
+  end
+end
+
 local function is_alnum(char, options)
   if not char or char == "" then return false end
   local p = options.word_components or "[A-Za-z0-9_]"
@@ -620,9 +679,9 @@ function KKV.output_with_multiple_colors(line, color_map, allow_comments)
 
   for _, p in ipairs(parts) do
     if p.type == "token" then
-      local t_color = token_to_color[p.content] or "black" 
+      local t_color = token_to_color[p.content] or "black"
       tex.sprint("\\textcolor{" .. t_color .. "}{")
-      tex.sprint(-2, p.content)
+      sprint_tex_mapped(p.content)
       tex.sprint("}")
     -- elseif p.type == "delim" then
     --   local d_color = p.color or "black"
@@ -634,23 +693,23 @@ function KKV.output_with_multiple_colors(line, color_map, allow_comments)
     elseif p.type == "delim" or p.type == "delim_plain" then
       local d_color = p.color or "black"
       tex.sprint("\\textcolor{" .. d_color .. "}{")
-      tex.sprint(-2, p.content)
+      sprint_tex_mapped(p.content)
       tex.sprint("}")
 
     elseif p.type == "token_delim" then
       local td_color = p.color or "black"
       tex.sprint("\\textcolor{" .. td_color .. "}{")
-      tex.sprint(-2, p.content)
+      sprint_tex_mapped(p.content)
       tex.sprint("}")
     else
-      tex.sprint(-2, p.content)
+      sprint_tex_mapped(p.content)
     end
   end
 
   if comment_part ~= "" then
     local c_color = options.comment_color or "gray"
     tex.sprint("\\textcolor{" .. c_color .. "}{")
-    tex.sprint(-2, comment_part)
+    sprint_tex_mapped(comment_part)
     tex.sprint("}")
   end
 end
