@@ -8,8 +8,8 @@
 
 luatexbase.provides_module{
   name     = 'KKluaverb',
-  date     = '2026/01/27',
-  version  = '2.1.2',
+  date     = '2026/06/11',
+  version  = '2.2.0',
 }
 
 ----- for .sty interface -----
@@ -20,12 +20,20 @@ KKLuaVerb = KKLuaVerb or {}
 ----- for .lua interface-----
 local KKV = {}
 local in_process = false
+  -- false  : not in raw mode
+  -- "verb" : raw mode opened by \KKverb (ends only with `trm`)
+  -- "code" : raw mode opened by \KKcodeS (ends only with \KKcodeE)
 
 local CMD_INIT = "\\KKlvStart*"
 local CMD_TERM = "\\KKlvEnd*"
 local DEFAULT_STARTER = "\\KKverb"
 local DEFAULT_STARTER_flag1 = "\\KKcodeS"
 local DEFAULT_TERMINATOR_flag1   = "\\KKcodeE"
+
+KKV.code_escape_char = "\\"
+  -- Inside \KKcodeS...\KKcodeE, this character placed
+  -- immediately before \KKcodeE makes it a literal text
+  -- instead of the terminator.
 
 local ltjflg = utf8.char(0xFFFFF) .. "\n$"
 ----------
@@ -199,7 +207,7 @@ function KKV.scanner_for_verb(line)
       local s_short_idx, e_short_idx = line:find(shortcut_start, pos, true)
 
       if s_short_idx and (not s_idx or s_short_idx < s_idx) then
-        in_process = true
+        in_process = "code"
 
         local next_char = line:sub(e_short_idx + 1, e_short_idx + 1)
         local style_num = "1" 
@@ -226,7 +234,7 @@ function KKV.scanner_for_verb(line)
           pos = #line + 1 
         end
       elseif s_idx then
-        in_process = true 
+        in_process = "verb"
         table.insert(res, line:sub(pos, s_idx - 1) .. CMD_INIT)
         pos = e_idx + 1
 
@@ -246,22 +254,48 @@ function KKV.scanner_for_verb(line)
         break
       end
 
-    else
-      local s_idx, e_idx = line:find(trm, pos, true)
-      local s_short_end_idx, e_short_end_idx = line:find(shortcut_end, pos, true)
+    elseif in_process == "code" then
+      -- Raw mode opened by \KKcodeS:
+      -- only \KKcodeE terminates it; `trm` (e.g. "|") is raw text.
+      -- An occurrence of \KKcodeE preceded by the escape char
+      -- is kept as literal text (with the escape char dropped).
+      local raw = {}
+      local search = pos
+      local s_end_idx, e_end_idx
+      while true do
+        local s, e = line:find(shortcut_end, search, true)
+        if not s then break end
+        if s > search and line:sub(s - 1, s - 1) == KKV.code_escape_char then
+          table.insert(raw, line:sub(search, s - 2) .. shortcut_end)
+          search = e + 1
+        else
+          s_end_idx, e_end_idx = s, e
+          break
+        end
+      end
 
-      if s_short_end_idx and (not s_idx or s_short_end_idx < s_idx) then
-        local sc_content = line:sub(pos, s_short_end_idx - 1)
-        table.insert(res, KKV.encode(sc_content) .. CMD_TERM .. "}")
-        in_process = false 
-        pos = e_short_end_idx + 1
-      
-      elseif s_idx then
+      if s_end_idx then
+        table.insert(raw, line:sub(search, s_end_idx - 1))
+        table.insert(res, KKV.encode(table.concat(raw)) .. CMD_TERM .. "}")
+        in_process = false
+        pos = e_end_idx + 1
+      else
+        table.insert(raw, line:sub(search))
+        table.insert(res, KKV.encode_tail(table.concat(raw)) .. "%")
+        break
+      end
+
+    else
+      -- Raw mode opened by \KKverb:
+      -- only `trm` terminates it.
+      local s_idx, e_idx = line:find(trm, pos, true)
+
+      if s_idx then
         local sc_content = line:sub(pos, s_idx - 1)
         table.insert(res, KKV.encode(sc_content) .. CMD_TERM)
-        in_process = false 
+        in_process = false
         pos = e_idx + 1
-      
+
       else
         local sc_content = line:sub(pos)
         table.insert(res, KKV.encode_tail(sc_content) .. "%")

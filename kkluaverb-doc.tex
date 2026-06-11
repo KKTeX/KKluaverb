@@ -199,7 +199,7 @@ fonttitle=\ascb@gtfamily, IfValueTF={#1}{title=\hspace*{.1em}【#2】〈#1〉\hs
 %%% titlepage
 \title{\texttt{KKluaverb} Package Documentation}
 \author{Kosei Kawaguchi a.k.a. KKTeX}
-\date{Version 2.1.2 (2026/01/27)}
+\date{Version 2.2.0 (2026/06/11)}
 %%%
 
 \begin{document}
@@ -368,6 +368,7 @@ When you use this Lua-based environment, please keep the following points in min
 \begin{itemize}
   \item All indents and spaces are displayed.
   \item Line breaks and blank lines are rendered exactly as they appear in the source.
+  \item The delimiter characters of \KKverb|\KKverb| have no special meaning here (since v2.2.0): the environment is terminated only by \KKverb|\KKcodeE|.
 \end{itemize}
 
 \subsubsection{\KKverb|\KKvLNChange|}
@@ -420,8 +421,9 @@ The following example illustrates this point.
 Some corner cases should be payed attention. 
 
 \subsubsection{Note\#1}
-You cannot use \verb|\KKcodeS| and \verb|\KKcodeE| in the argument of \verb|\KKverb| command. When the scanner is activated, \verb|\KKcodeS| forcibly starts the encoding system, even it is wrapped by \verb|\KKverb|. 
-If you need to display \verb|\KKcodeS| and \verb|\KKcodeE| as they are, deactivate the scanner by \verb|\KKvScanOff| and use \verb|\verb|.
+Since v2.2.0, the raw scan remembers which command started it. A scan started by \verb|\KKverb| is terminated only by its closing delimiter, and a scan started by \verb|\KKcodeS| is terminated only by \verb|\KKcodeE|. Therefore you can now write \verb|\KKcodeS| and \verb|\KKcodeE| in the argument of \verb|\KKverb|, and the delimiter characters of \verb|\KKverb| can appear freely inside the \verb|\KKcodeS/E| environment.
+(In versions prior to v2.2.0, \verb|\KKcodeS| forcibly started the encoding system even when it was wrapped by \verb|\KKverb|, and the \verb|\KKverb| delimiter terminated the \verb|\KKcodeS/E| environment.)
+Note that \verb|\KKcodeS| appearing outside of a raw scan still starts the encoding system unconditionally; if you need to display it as it is in a normal context, use \verb|\KKverb| or deactivate the scanner by \verb|\KKvScanOff|.
 
 \subsubsection{Note\#2}
 Any text on the same line that falls "inside" the \verb|\KKcodeS| and \verb|\KKcodeE| boundaries is ignored, while text "outside" them is preserved. The following example will illustrate the behavior.
@@ -437,6 +439,25 @@ Not ignored. \KKcodeS+ Ignored.
 % Contents
 Ignored. \KKcodeE Not ignored.
 \end{OutPut}
+
+\KKvScanOff
+\subsubsection{Note\#3}
+Since v2.2.0, you can output a literal \verb|\KKcodeE| inside the environment by putting the escape character (default: a backslash) immediately before it. The escape character itself is removed from the output, and the raw scan continues.
+
+\begin{SourceCode}{Input}{TeX}
+  \KKcodeS
+  literal: \\KKcodeE is rendered as raw text
+  \KKcodeE
+\end{SourceCode}
+\KKvScanOn
+\begin{OutPut}{Output}
+\KKcodeS
+literal: \\KKcodeE is rendered as raw text
+\KKcodeE
+\end{OutPut}
+\KKvScanOff
+The escape character can be changed by \verb|\KKvSetCodeEscape{<character>}|.
+\KKvScanOn
 
 \section{Color Mapping}
 \KKvScanOff
