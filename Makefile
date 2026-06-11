@@ -48,7 +48,7 @@ styFILENAME = KKluaverb
 ZIP_DIR = $(PACKAGE)
 
 # ----- zip generation -----
-zip: distclean builddoc
+zip: distclean doc
 	mkdir -p $(ZIP_DIR)
 	cp $(styFILENAME).lua $(ZIP_DIR)
 	cp $(styFILENAME).sty $(ZIP_DIR)
