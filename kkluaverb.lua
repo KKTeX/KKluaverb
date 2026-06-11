@@ -31,6 +31,7 @@ local DEFAULT_STARTER_flag1 = "\\KKcodeS"
 local DEFAULT_TERMINATOR_flag1   = "\\KKcodeE"
 
 KKV.code_escape_char = "\\"
+KKV.wrap = false
   -- Inside \KKcodeS...\KKcodeE, this character placed
   -- immediately before \KKcodeE makes it a literal text
   -- instead of the terminator.
@@ -88,6 +89,18 @@ KKV.add_replacement(" ", "\194\160")
 
 
 ----- decode -----
+local function count_leading_nbsp(s)
+  -- Returns (count, first_non_nbsp_byte_pos).
+  -- NBSP = U+00A0 = UTF-8: 0xC2 0xA0
+  local n, i = 0, 1
+  while i + 1 <= #s do
+    if s:byte(i) == 0xC2 and s:byte(i + 1) == 0xA0 then
+      n = n + 1; i = i + 2
+    else break end
+  end
+  return n, i
+end
+
 function KKV.decode(rstr)
   local chex = function(s) return utf8.char(tonumber(s, 16)) end
   local decoded = rstr
@@ -102,7 +115,21 @@ function KKV.decode(rstr)
 
   -- How to process linebreak
   local lb_flag = tex.gettoks("kklv@linebreak")
-  
+
+  -- Character width for wrap hangindent (measured from current \ttfamily font)
+  local char_width_sp, wrap_indent_sp = 0, 0
+  if KKLuaVerb.wrap then
+    local f = font.getfont(font.current())
+    if f and f.characters then
+      local c = f.characters[48] or f.characters[65] or f.characters[120]
+      char_width_sp = (c and c.width) or 0
+    end
+    if char_width_sp == 0 and f and f.parameters then
+      char_width_sp = f.parameters[2] or 0
+    end
+    wrap_indent_sp = tex.getdimen("kklv@wrap@indent")
+  end
+
   -- If lb_flag is "1",
   -- a "verbatim paragraph" is produced.
   -- Behave like an environment.
@@ -117,17 +144,43 @@ function KKV.decode(rstr)
     local last_idx = #dc_lines
     last_idx = last_idx - 1
       -- Delete the last line.
-    tex.sprint("\\par\\noindent")
-    for i = 2, last_idx do -- ref: NOTE#1
-      local content = dc_lines[i]
-      if content ~= "" then
-        local map_to_use = KKV.active_map or {}
-        KKV.output_with_multiple_colors(content, map_to_use, true)
-      end
-      if i < last_idx then
-        tex.sprint("\\hfill\\break\\noindent")
-      else
+
+    if KKLuaVerb.wrap then
+      -- Each logical line becomes its own paragraph so \hangindent applies per-line.
+      -- \parskip0pt suppresses inter-paragraph spacing within the block.
+      tex.sprint("\\par{\\parskip0pt\\relax")
+      for i = 2, last_idx do -- ref: NOTE#1
+        local content = dc_lines[i]
+        local hangindent_sp = wrap_indent_sp
+        if content ~= "" then
+          local leading_n, rest_pos = count_leading_nbsp(content)
+          -- Keep leading NBSP (indentation); replace remaining NBSP with breakable spaces.
+          local leading_bytes = content:sub(1, rest_pos - 1)
+          local rest = content:sub(rest_pos):gsub("\194\160", " ")
+          content = leading_bytes .. rest
+          hangindent_sp = leading_n * char_width_sp + wrap_indent_sp
+        end
+        tex.sprint("\\noindent\\hangafter1\\hangindent=" .. hangindent_sp .. "sp ")
+        if content ~= "" then
+          local map_to_use = KKV.active_map or {}
+          KKV.output_with_multiple_colors(content, map_to_use, true)
+        end
         tex.sprint("\\hspace*{\\fill}\\par")
+      end
+      tex.sprint("}")
+    else
+      tex.sprint("\\par\\noindent")
+      for i = 2, last_idx do -- ref: NOTE#1
+        local content = dc_lines[i]
+        if content ~= "" then
+          local map_to_use = KKV.active_map or {}
+          KKV.output_with_multiple_colors(content, map_to_use, true)
+        end
+        if i < last_idx then
+          tex.sprint("\\hfill\\break\\noindent")
+        else
+          tex.sprint("\\hspace*{\\fill}\\par")
+        end
       end
     end
 
@@ -146,18 +199,42 @@ function KKV.decode(rstr)
     local last_idx = #dc_lines
     last_idx = last_idx - 1
       -- Delete the last line.
-    tex.sprint("\\par\\noindent")
-    for i = 2, last_idx do -- ref: NOTE#1
-      tex.sprint("\\KKlvLineNumber{" .. (i - 1 + fl_linenumber) .. "}")
-      local content = dc_lines[i]
-      if content ~= "" then
-        local map_to_use = KKV.active_map or {}
-        KKV.output_with_multiple_colors(content, map_to_use, true)
-      end
-      if i < last_idx then
-        tex.sprint("\\hfill\\break\\noindent")
-      else
+
+    if KKLuaVerb.wrap then
+      tex.sprint("\\par{\\parskip0pt\\relax")
+      for i = 2, last_idx do -- ref: NOTE#1
+        local content = dc_lines[i]
+        local hangindent_sp = wrap_indent_sp
+        if content ~= "" then
+          local leading_n, rest_pos = count_leading_nbsp(content)
+          local leading_bytes = content:sub(1, rest_pos - 1)
+          local rest = content:sub(rest_pos):gsub("\194\160", " ")
+          content = leading_bytes .. rest
+          hangindent_sp = leading_n * char_width_sp + wrap_indent_sp
+        end
+        tex.sprint("\\noindent\\hangafter1\\hangindent=" .. hangindent_sp .. "sp ")
+        tex.sprint("\\KKlvLineNumber{" .. (i - 1 + fl_linenumber) .. "}")
+        if content ~= "" then
+          local map_to_use = KKV.active_map or {}
+          KKV.output_with_multiple_colors(content, map_to_use, true)
+        end
         tex.sprint("\\hspace*{\\fill}\\par")
+      end
+      tex.sprint("}")
+    else
+      tex.sprint("\\par\\noindent")
+      for i = 2, last_idx do -- ref: NOTE#1
+        tex.sprint("\\KKlvLineNumber{" .. (i - 1 + fl_linenumber) .. "}")
+        local content = dc_lines[i]
+        if content ~= "" then
+          local map_to_use = KKV.active_map or {}
+          KKV.output_with_multiple_colors(content, map_to_use, true)
+        end
+        if i < last_idx then
+          tex.sprint("\\hfill\\break\\noindent")
+        else
+          tex.sprint("\\hspace*{\\fill}\\par")
+        end
       end
     end
 

@@ -27,9 +27,12 @@
   enabled/.code = {%
     \directlua{KKLuaVerb.enabled = #1}%
   },
+  wrap/.code     = {\directlua{KKLuaVerb.wrap = (#1)}},
+  wrapindent/.code = {\kklv@wrap@indent=#1},
 }
 \newcommand{\KKvOpChange}[1]{\pgfkeys{/kklv/.cd, #1}}
-\KKvOpChange{font=\ttfamily, color=black, enabled=true}
+\newdimen\kklv@wrap@indent
+\KKvOpChange{font=\ttfamily, color=black, enabled=true, wrap=false, wrapindent=2em}
 \newcommand{\KKvScanOn}{\KKvOpChange{enabled=true}}
 \newcommand{\KKvScanOff}{\KKvOpChange{enabled=false}}
 %%%

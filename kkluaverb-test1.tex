@@ -1,0 +1,66 @@
+\documentclass{ltjsarticle}
+\usepackage[margin=20mm]{geometry}
+\usepackage{KKluaverb}
+
+\begin{document}
+
+%% --- Section 1: wrap=false (default), overflow expected ---
+\section*{wrap=false (default): overflow expected}
+
+\KKcodeS
+x = aaaa + bbbb + cccc + dddd + eeee + ffff + gggg + hhhh + iiii + jjjj + kkkk + llll + mmmm + nnnn
+\KKcodeE
+
+\KKcodeS+
+  indented = aaaa + bbbb + cccc + dddd + eeee + ffff + gggg + hhhh + iiii + jjjj + kkkk + llll
+  short
+\KKcodeE
+
+%% --- Section 2: wrap=true, style=1 ---
+\section*{wrap=true, style=1}
+
+\KKvOpChange{wrap=true}
+
+\KKcodeS
+x = aaaa + bbbb + cccc + dddd + eeee + ffff + gggg + hhhh + iiii + jjjj + kkkk + llll + mmmm + nnnn
+short line
+  indented short
+\KKcodeE
+
+%% --- Section 3: wrap=true, style=2 (line numbers: only on 1st sub-line) ---
+\section*{wrap=true, style=2, line numbers}
+
+\KKcodeS+
+  indented = aaaa + bbbb + cccc + dddd + eeee + ffff + gggg + hhhh + iiii + jjjj + kkkk + llll
+  short
+\KKcodeE
+
+%% --- Section 4: wrap=true with wrapindent=4em ---
+\section*{wrap=true, wrapindent=4em}
+
+\KKvOpChange{wrapindent=4em}
+
+\KKcodeS
+x = aaaa + bbbb + cccc + dddd + eeee + ffff + gggg + hhhh + iiii + jjjj + kkkk + llll + mmmm + nnnn
+\KKcodeE
+
+%% --- Section 5: wrap=true with Japanese characters ---
+\section*{wrap=true, 日本語を含む行}
+
+\KKvOpChange{wrapindent=2em}
+
+\KKcodeS
+これはとても長い日本語のテキストで折り返しが発生するはずです。テスト用の長い文章を書いています。
+\KKcodeE
+
+%% --- Section 6: wrap=false again (reset) ---
+\section*{wrap=false (reset)}
+
+\KKvOpChange{wrap=false}
+
+\KKcodeS
+short line
+another short line
+\KKcodeE
+
+\end{document}
