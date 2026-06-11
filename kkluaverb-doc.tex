@@ -199,7 +199,7 @@ fonttitle=\ascb@gtfamily, IfValueTF={#1}{title=\hspace*{.1em}【#2】〈#1〉\hs
 %%% titlepage
 \title{\texttt{KKluaverb} Package Documentation}
 \author{Kosei Kawaguchi a.k.a. KKTeX}
-\date{Version 2.2.0 (2026/06/11)}
+\date{Version 2.3.0 (2026/06/12)}
 %%%
 
 \begin{document}
@@ -281,6 +281,8 @@ The usage is as follows:
     font & \KKverb|\ttfamily| & Sets the font for the verbatim text. \\
     color & \KKverb|black| & Sets the text color. \\
     enabled & \KKverb|true| & Activates or deactivates the scanning engine. \\
+    wrap & \KKverb|false| & Enables auto wrapping in code blocks. (Since v2.3.0) \\
+    wrapindent & \KKverb|2em| & Continuation line indent. (Since v2.3.0) \\
   \end{tblr}
 \end{center}\bigskip
 
@@ -457,6 +459,34 @@ literal: \\KKcodeE is rendered as raw text
 \end{OutPut}
 \KKvScanOff
 The escape character can be changed by \verb|\KKvSetCodeEscape{<character>}|.
+\KKvScanOn
+
+\subsubsection{Note\#4: Automatic Line Wrapping (Since v2.3.0)}
+\KKvScanOff
+By default, long lines in \verb|\KKcodeS/E| blocks overflow beyond the right margin (Overfull \verb|\hbox|). Since v2.3.0, you can enable automatic wrapping by \verb|\KKvOpChange{wrap=true}|.
+
+\begin{SourceCode}{Input}{TeX}
+  \KKvOpChange{wrap=true}
+
+  \KKcodeS
+  x = aaaa + bbbb + cccc + dddd + eeee + ffff + gggg + hhhh + iiii + jjjj + kkkk
+  \KKcodeE
+
+  \KKvOpChange{wrap=false}
+\end{SourceCode}
+\KKvScanOn
+\begin{OutPut}{Output}
+\KKvOpChange{wrap=true}
+
+\KKcodeS
+x = aaaa + bbbb + cccc + dddd + eeee + ffff + gggg + hhhh + iiii + jjjj + kkkk
+\KKcodeE
+
+\KKvOpChange{wrap=false}
+\end{OutPut}
+\KKvScanOff
+
+The indentation of continuation lines equals the original code indentation plus \verb|wrapindent| (default: \verb|2em|). For style=2 (line-numbered), continuation lines do not receive a line number.
 \KKvScanOn
 
 \section{Color Mapping}
@@ -674,5 +704,34 @@ By default, this package automatically replaces any spaces to Unicode character 
 \KKvSpaceForce
 \KKverb|  Oh, spaces are no longer visualized.  |
 \end{OutPut}
+
+\KKvScanOff
+\subsection{TeX-command Mapping (Since v2.3.0)}
+\verb|\KKvSetMap| replaces a character with another \emph{character}. However, there are cases where you want to replace a character with a \emph{TeX command}. For example, \verb|\KKvSetMap{ }{␣}| replaces spaces with U+2423, but this character may be rendered as a full-width glyph in Japanese font contexts.
+
+\verb|\KKvSetMapTeX{<from>}{<tex-cmd>}| solves this by mapping the character to a TeX command, which is emitted via \verb|tex.sprint| (with expansion) at output time.
+\KKvScanOn
+
+\begin{SourceCode}{Input}{TeX}[Actual Use]
+  \KKvSpaceVisible              % ON: spaces -> \textvisiblespace
+  \KKverb|  Hello World!  |
+
+  \KKvClearMapTeX{ }            % OFF: back to NBSP
+  \KKverb|  Hello World!  |
+\end{SourceCode}
+\KKvScanOn
+\begin{OutPut}{Output}
+\KKvSpaceVisible
+\KKverb|  Hello World!  |
+
+\KKvClearMapTeX{ }
+\KKverb|  Hello World!  |
+\end{OutPut}
+
+\KKvScanOff
+\verb|\KKvSpaceVisible| is a convenience wrapper for \verb|\KKvSetMapTeX{ }{\textvisiblespace}|.
+\verb|\KKvClearMapTeX{<char>}| removes the TeX-command mapping for a character and restores the default behaviour (for space: reverts to non-breaking space).
+Note that calling \verb|\KKvSetMap| on a character that currently has a TeX-command mapping automatically removes the old mapping.
+\KKvScanOn
 \end{document}
 

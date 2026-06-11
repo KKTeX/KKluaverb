@@ -8,8 +8,8 @@
 
 luatexbase.provides_module{
   name     = 'KKluaverb',
-  date     = '2026/06/11',
-  version  = '2.2.0',
+  date     = '2026/06/12',
+  version  = '2.3.0',
 }
 
 ----- for .sty interface -----
