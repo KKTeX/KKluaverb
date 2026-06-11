@@ -80,6 +80,11 @@ end
 KKV.replacements = {}
 
 function KKV.add_replacement(from_char, to_char)
+  -- When overwriting, clean up any tex_map entry for the old marker.
+  local old = KKV.replacements[from_char]
+  if old and KKV.tex_map[old] then
+    KKV.tex_map[old] = nil
+  end
   KKV.replacements[from_char] = to_char
 end
 
@@ -111,6 +116,20 @@ function KKV.add_tex_map_from(from_char, tex_cmd)
   end
   KKV.tex_map[marker] = tex_cmd
   KKV.add_replacement(from_char, marker)
+end
+
+function KKV.clear_tex_map_for(from_char)
+  -- Remove the tex_map entry for from_char and restore its default replacement.
+  -- For space, the default is NBSP; for other chars, the mapping is simply removed.
+  local marker = KKV.replacements[from_char]
+  if marker and KKV.tex_map[marker] then
+    KKV.tex_map[marker] = nil
+    if from_char == " " then
+      KKV.replacements[from_char] = "\194\160"
+    else
+      KKV.replacements[from_char] = nil
+    end
+  end
 end
 ----------
 
